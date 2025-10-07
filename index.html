@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Samsung A15</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    body {
+      background: #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .telefono {
+      width: 360px;
+      height: 780px;
+      background: #111;
+      border-radius: 35px;
+      padding: 10px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      border: 8px solid #000;
+    }
+
+    @media (max-height: 820px) {
+      .telefono {
+        height: 95vh;
+        width: calc(95vh / 2.166);
+      }
+    }
+
+    .pantalla {
+      background: #fff;
+      border-radius: 25px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .notch {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 15px;
+      background: #000;
+      border-radius: 10px;
+      z-index: 1001;
+    }
+
+    #map {
+      flex: 2;
+      width: 100%;
+      height: 60%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .buscador {
+      position: absolute;
+      top: 12px;
+      left: 60%;
+      transform: translateX(-50%);
+      z-index: 1002;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 6px 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .buscador input {
+      border: none;
+      outline: none;
+      padding: 5px;
+      border-radius: 5px;
+      width: 130px;
+    }
+
+    .buscador button {
+      background: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 8px;
+      cursor: pointer;
+    }
+
+    .listado {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f8f8f8;
+      padding-bottom: 55px; /* deja espacio para la barra Android */
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .item img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+
+    .info {
+      font-size: 12px;
+      flex: 1;
+    }
+
+    .info strong {
+      display: block;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .acciones {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .acciones button {
+      font-size: 10px;
+      padding: 4px 6px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .acciones .preguntar {
+      background-color: #4caf50;
+    }
+
+    .acciones .reservar {
+      background-color: #2196f3;
+    }
+
+    /* Barra Android inferior */
+    .botones-android {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 45px;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 50px;
+      border-bottom-left-radius: 25px;
+      border-bottom-right-radius: 25px;
+      z-index: 1003;
+    }
+
+    .boton-android {
+      width: 22px;
+      height: 22px;
+      opacity: 0.8;
+    }
+
+    .boton-android.atras::before {
+      content: "<";
+      font-size: 22px;
+      color: white;
+      display: block;
+      text-align: center;
+    }
+
+    .boton-android.home {
+      border: 2px solid white;
+      border-radius: 5px;
+    }
+
+    .boton-android.menu {
+      width: 18px;
+      height: 2px;
+      background: white;
+      position: relative;
+    }
+
+    .boton-android.menu::before,
+    .boton-android.menu::after {
+      content: "";
+      width: 18px;
+      height: 2px;
+      background: white;
+      position: absolute;
+      left: 0;
+    }
+
+    .boton-android.menu::before {
+      top: -6px;
+    }
+
+    .boton-android.menu::after {
+      top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="telefono">
+    <div class="pantalla">
+      <div class="notch"></div>
+      <div id="map"></div>
+
+      <div class="buscador">
+        <input type="text" placeholder="Buscar zona...">
+        <button>🔍</button>
+      </div>
+
+      <div class="listado">
+        <div class="item">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100" alt="Habitación">
+          <div class="info">
+            <strong>Villa Crespo</strong>
+            Cerca de Callao y Lavalle<br>
+            9 m² - Disponibilidad inmediata
+          </div>
+          <div class="acciones">
+            <button class="preguntar">Preguntar</button>
+            <button class="reservar">Reservar</button>
+          </div>
+        </div>
+
+        <div class="item">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100" alt="Habitación">
+          <div class="info">
+            <strong>Palermo</strong>
+            A metros de Scalabrini Ortiz<br>
+            12 m² - Amoblado
+          </div>
+          <div class="acciones">
+            <button class="preguntar">Preguntar</button>
+            <button class="reservar">Reservar</button>
+          </div>
+        </div>
+
+        <div class="item">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100" alt="Habitación">
+          <div class="info">
+            <strong>Recoleta</strong>
+            Zona céntrica<br>
+            10 m² - WiFi y calefacción
+          </div>
+          <div class="acciones">
+            <button class="preguntar">Preguntar</button>
+            <button class="reservar">Reservar</button>
+          </div>
+        </div>
+
+        <div class="item">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100" alt="Habitación">
+          <div class="info">
+            <strong>Caballito</strong>
+            Próximo a Rivadavia<br>
+            14 m² - Luz natural
+          </div>
+          <div class="acciones">
+            <button class="preguntar">Preguntar</button>
+            <button class="reservar">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="botones-android">
+        <div class="boton-android atras"></div>
+        <div class="boton-android home"></div>
+        <div class="boton-android menu"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const map = L.map('map').setView([-34.6037, -58.3816], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const coords = [
+      [-34.6037, -58.3816], [-34.608, -58.373], [-34.6, -58.39],
+      [-34.61, -58.37], [-34.59, -58.38], [-34.62, -58.375],
+      [-34.604, -58.385], [-34.605, -58.395], [-34.598, -58.37], [-34.607, -58.379]
+    ];
+
+    coords.forEach(c => L.marker(c).addTo(map));
+  </script>
+</body>
+</html>
