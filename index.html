@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Samsung A15</title>
+  <title>GuardaCerca - Mockup</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
@@ -109,6 +109,7 @@
       padding: 8px;
       margin-bottom: 8px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
     }
 
     .item img {
@@ -205,118 +206,73 @@
       left: 0;
     }
 
-    .boton-android.menu::before {
-      top: -6px;
-    }
+    .boton-android.menu::before { top: -6px; }
+    .boton-android.menu::after { top: 6px; }
 
-    .boton-android.menu::after {
-      top: 6px;
-    }
-
-    /* === NUEVAS PANTALLAS === */
-    .pantalla-detalle, .pantalla-reserva {
+    /* Modal */
+    .modal {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: white;
+      z-index: 2000;
       display: none;
       flex-direction: column;
       border-radius: 25px;
       overflow-y: auto;
-      animation: fadeIn 0.3s ease-in-out;
-      z-index: 2000;
     }
 
-    .pantalla-detalle.activa, .pantalla-reserva.activa {
-      display: flex;
-    }
+    .modal.active { display: flex; }
 
-    .pantalla-detalle img, .pantalla-reserva img {
+    .modal img {
       width: 100%;
-      height: 220px;
+      height: 200px;
       object-fit: cover;
     }
 
-    .detalle-info, .reserva-info {
-      padding: 15px;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .detalle-info h2, .reserva-info h2 {
-      margin-top: 0;
-    }
-
-    .acciones-detalle, .acciones-reserva {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
-    }
-
-    .btn-reservar, .btn-confirmar {
-      background: #2196f3;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .corazon {
-      font-size: 26px;
-      color: #aaa;
-      cursor: pointer;
-    }
-
-    .corazon.activo {
-      color: red;
-    }
-
-    .cerrar-detalle, .volver-reserva {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
+    .modal h2 {
+      margin: 10px;
       font-size: 18px;
-      cursor: pointer;
     }
 
-    .volver-reserva {
-      left: 15px;
-      right: auto;
-    }
-
-    .form-reserva {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin: 10px 15px;
-    }
-
-    .form-reserva label {
-      font-size: 13px;
+    .modal p {
+      margin: 10px;
+      font-size: 14px;
       color: #555;
     }
 
-    .form-reserva input, .form-reserva select {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    .modal .acciones-modal {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 0;
+    }
+
+    .acciones-modal button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
       font-size: 14px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .acciones-modal .reservar {
+      background-color: #2196f3;
+    }
+
+    .acciones-modal .favorito {
+      background-color: #e91e63;
+    }
+
+    .cerrar {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
     }
   </style>
 </head>
@@ -332,7 +288,7 @@
       </div>
 
       <div class="listado">
-        <div class="item">
+        <div class="item" data-lat="-34.6037" data-lng="-58.3816" data-titulo="Villa Crespo" data-img="img/1.jpg" data-desc="Habitación cómoda cerca de Callao y Lavalle, ideal para estudiantes.">
           <img src="img/1.jpg" alt="Habitación">
           <div class="info">
             <strong>Villa Crespo</strong>
@@ -345,7 +301,7 @@
           </div>
         </div>
 
-        <div class="item">
+        <div class="item" data-lat="-34.598" data-lng="-58.435" data-titulo="Palermo" data-img="img/2.jfif" data-desc="A metros de Scalabrini Ortiz. Habitación luminosa y moderna.">
           <img src="img/2.jfif" alt="Habitación">
           <div class="info">
             <strong>Palermo</strong>
@@ -358,37 +314,12 @@
           </div>
         </div>
 
-        <div class="item">
+        <div class="item" data-lat="-34.595" data-lng="-58.396" data-titulo="Recoleta" data-img="img/3.jpg" data-desc="Zona céntrica, habitación privada, todos los servicios incluidos.">
           <img src="img/3.jpg" alt="Habitación">
           <div class="info">
             <strong>Recoleta</strong>
             Zona céntrica<br>
             10 m² - Disponibilidad inmediata
-          </div>
-          <div class="acciones">
-            <button class="preguntar">Preguntar</button>
-            <button class="reservar">Reservar</button>
-          </div>
-        </div>
-
-        <div class="item">
-          <img src="img/4.jfif" alt="Habitación">
-          <div class="info">
-            <strong>Caballito</strong>
-            Próximo a Rivadavia<br>
-            14 m² - MAXIMO 3 Meses
-          </div>
-          <div class="acciones">
-            <button class="preguntar">Preguntar</button>
-            <button class="reservar">Reservar</button>
-          </div>
-        </div>
-        <div class="item">
-          <img src="img/5.jfif" alt="Habitación">
-          <div class="info">
-            <strong>Caballito</strong>
-            Próximo a Rivadavia<br>
-            14 m² - OFERTA, paga 5 meses y obtene 6 
           </div>
           <div class="acciones">
             <button class="preguntar">Preguntar</button>
@@ -402,6 +333,17 @@
         <div class="boton-android home"></div>
         <div class="boton-android menu"></div>
       </div>
+
+      <div class="modal" id="modal">
+        <span class="cerrar" id="cerrarModal">&times;</span>
+        <img id="modalImg" src="" alt="Habitación">
+        <h2 id="modalTitulo"></h2>
+        <p id="modalDesc"></p>
+        <div class="acciones-modal">
+          <button class="reservar">Reservar</button>
+          <button class="favorito">❤️</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -412,109 +354,40 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    const ubicaciones = {
-      "Villa Crespo": [-34.601, -58.435],
-      "Palermo": [-34.58, -58.42],
-      "Recoleta": [-34.59, -58.395],
-      "Caballito": [-34.62, -58.44]
-    };
+    // marcadores de ejemplo
+    const marcadores = [
+      [-34.6037, -58.3816],
+      [-34.598, -58.435],
+      [-34.595, -58.396]
+    ];
+    marcadores.forEach(c => L.marker(c).addTo(map));
 
-    document.querySelectorAll(".item").forEach(item => {
-      const nombre = item.querySelector("strong").innerText;
-      const coords = ubicaciones[nombre];
-      if (coords) {
-        item.addEventListener("click", () => {
-          map.flyTo(coords, 15, { duration: 1.2 });
+    // seleccionar item
+    document.querySelectorAll('.item').forEach(item => {
+      item.addEventListener('click', () => {
+        const lat = item.dataset.lat;
+        const lng = item.dataset.lng;
+        map.setView([lat, lng], 15);
+      });
+
+      item.querySelectorAll('.preguntar, .reservar').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const modal = document.getElementById('modal');
+          document.getElementById('modalImg').src = item.dataset.img;
+          document.getElementById('modalTitulo').innerText = item.dataset.titulo;
+          document.getElementById('modalDesc').innerText = item.dataset.desc;
+          modal.classList.add('active');
         });
-      }
+      });
     });
 
-    const detalle = document.createElement("div");
-    detalle.classList.add("pantalla-detalle");
-    document.body.appendChild(detalle);
-
-    const reserva = document.createElement("div");
-    reserva.classList.add("pantalla-reserva");
-    document.body.appendChild(reserva);
-
-    function mostrarDetalle(nombre, imgSrc) {
-      detalle.innerHTML = `
-        <button class="cerrar-detalle">✕</button>
-        <img src="${imgSrc}" alt="${nombre}">
-        <div class="detalle-info">
-          <h2>${nombre}</h2>
-          <p>Habitación privada amoblada, incluye servicios básicos y WiFi. Ideal para estudiantes o trabajadores temporales.</p>
-          <p><strong>Condiciones:</strong> Contrato mínimo 1 mes. No se permiten mascotas. Depósito equivalente a un mes.</p>
-        </div>
-        <div class="acciones-detalle">
-          <button class="btn-reservar">Reservar</button>
-          <span class="corazon">♡</span>
-        </div>
-      `;
-      detalle.classList.add("activa");
-
-      detalle.querySelector(".cerrar-detalle").onclick = () => detalle.classList.remove("activa");
-
-      const corazon = detalle.querySelector(".corazon");
-      corazon.addEventListener("click", () => {
-        corazon.classList.toggle("activo");
-        corazon.innerText = corazon.classList.contains("activo") ? "❤️" : "♡";
-      });
-
-      detalle.querySelector(".btn-reservar").onclick = () => {
-        detalle.classList.remove("activa");
-        mostrarPantallaReserva(nombre, imgSrc);
-      };
-    }
-
-    function mostrarPantallaReserva(nombre, imgSrc) {
-      reserva.innerHTML = `
-        <button class="volver-reserva">←</button>
-        <img src="${imgSrc}" alt="${nombre}">
-        <div class="reserva-info">
-          <h2>Confirmar Reserva</h2>
-          <p><strong>${nombre}</strong></p>
-        </div>
-        <form class="form-reserva">
-          <label>Nombre completo:</label>
-          <input type="text" placeholder="Tu nombre" required>
-          <label>Fecha de ingreso:</label>
-          <input type="date" required>
-          <label>Duración (meses):</label>
-          <select>
-            <option value="1">1 mes</option>
-            <option value="3">3 meses</option>
-            <option value="6">6 meses</option>
-            <option value="12">12 meses</option>
-          </select>
-          <button type="submit" class="btn-confirmar">Confirmar Reserva</button>
-        </form>
-      `;
-      reserva.classList.add("activa");
-
-      reserva.querySelector(".volver-reserva").onclick = () => {
-        reserva.classList.remove("activa");
-        detalle.classList.add("activa");
-      };
-
-      reserva.querySelector(".form-reserva").onsubmit = e => {
-        e.preventDefault();
-        alert("✅ Reserva confirmada para " + nombre + "!");
-        reserva.classList.remove("activa");
-      };
-    }
-
-    document.querySelectorAll(".acciones .preguntar, .acciones .reservar").forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        const item = e.target.closest(".item");
-        const nombre = item.querySelector("strong").innerText;
-        const imgSrc = item.querySelector("img").src;
-        mostrarDetalle(nombre, imgSrc);
-      });
+    document.getElementById('cerrarModal').addEventListener('click', () => {
+      document.getElementById('modal').classList.remove('active');
     });
   </script>
 </body>
 </html>
+
 
 
