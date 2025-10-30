@@ -27,15 +27,10 @@
       overflow: hidden;
     }
 
-    .status-bar {
-      height: 30px;
-      background: #000;
-    }
-
     .app {
       display: flex;
       flex-direction: column;
-      height: calc(100% - 30px);
+      height: 100%;
     }
 
     header {
@@ -69,6 +64,7 @@
       height: 250px;
       border-radius: 10px;
       margin-bottom: 10px;
+      overflow: hidden;
     }
 
     iframe {
@@ -141,7 +137,6 @@
 </head>
 <body>
   <div class="phone">
-    <div class="status-bar"></div>
     <div class="app">
       <header>
         <h1>GuardaCerca</h1>
@@ -154,14 +149,13 @@
       <div class="content" id="mainContent">
         <div class="map">
           <iframe
-            src="https://www.google.com/maps/d/embed?mid=1zFSvVnI_LdXbQKSlXxwXr2sNwhnWQOA&ehbc=2E312F"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3283.9225238647274!2d-58.40973682435555!3d-34.6075682729488!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bccad8a4a889ad%3A0x9a3b56e9b1b9f9b4!2sBuenos%20Aires%2C%20Argentina!5e0!3m2!1ses-419!2sar!4v1730280000000"
             allowfullscreen
+            loading="lazy"
           ></iframe>
         </div>
 
-        <div id="listadoBauleras">
-          <!-- Bauleras -->
-        </div>
+        <div id="listadoBauleras"></div>
       </div>
 
       <div class="formulario" id="formPregunta">
@@ -180,16 +174,16 @@
 
   <script>
     const bauleras = [
-      { nombre: "Baulera 1", m2: 8, seguro: "Sí", disponible: "Sí", calificacion: 4 },
-      { nombre: "Baulera 2", m2: 10, seguro: "No", disponible: "No", calificacion: 3 },
-      { nombre: "Baulera 3", m2: 6, seguro: "Sí", disponible: "Sí", calificacion: 5 },
-      { nombre: "Baulera 4", m2: 12, seguro: "Sí", disponible: "Sí", calificacion: 5 },
-      { nombre: "Baulera 5", m2: 9, seguro: "No", disponible: "Sí", calificacion: 4 },
-      { nombre: "Baulera 6", m2: 15, seguro: "Sí", disponible: "Sí", calificacion: 5 },
-      { nombre: "Baulera 7", m2: 7, seguro: "No", disponible: "Sí", calificacion: 4 },
-      { nombre: "Baulera 8", m2: 11, seguro: "Sí", disponible: "No", calificacion: 3 },
-      { nombre: "Baulera 9", m2: 5, seguro: "No", disponible: "Sí", calificacion: 5 },
-      { nombre: "Baulera 10", m2: 14, seguro: "Sí", disponible: "Sí", calificacion: 5 }
+      { nombre: "Baulera Palermo", m2: 10, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera Belgrano", m2: 8, seguro: "No", disponible: "Sí", calificacion: 4 },
+      { nombre: "Baulera Caballito", m2: 12, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera San Telmo", m2: 6, seguro: "No", disponible: "No", calificacion: 3 },
+      { nombre: "Baulera Recoleta", m2: 9, seguro: "Sí", disponible: "Sí", calificacion: 4 },
+      { nombre: "Baulera Flores", m2: 7, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera Villa Crespo", m2: 5, seguro: "No", disponible: "Sí", calificacion: 4 },
+      { nombre: "Baulera Almagro", m2: 11, seguro: "Sí", disponible: "No", calificacion: 3 },
+      { nombre: "Baulera Chacarita", m2: 14, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera Barracas", m2: 10, seguro: "No", disponible: "Sí", calificacion: 4 }
     ];
 
     function renderBauleras() {
@@ -229,6 +223,7 @@
   </script>
 </body>
 </html>
+
 
 
 
