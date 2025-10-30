@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -373,51 +376,72 @@
   </div>
 
   <script>
-    // Datos: Múltiples ubicaciones por barrio con imágenes reales
+    // Lista de imágenes locales en la carpeta ../img/
+    const imagenesLocales = [
+      '../img/1.jpg',
+      '../img/2.jfif',
+      '../img/3.jpg',
+      '../img/4.jfif',
+      '../img/5.jfif',
+      '../img/6.jpg'
+    ];
+
+    // Función para obtener imagen aleatoria
+    function getImagenAleatoria() {
+      const indiceAleatorio = Math.floor(Math.random() * imagenesLocales.length);
+      return imagenesLocales[indiceAleatorio];
+    }
+
+    // Datos: Múltiples ubicaciones por barrio con imágenes locales
     const places = [
       // Palermo - 3 ubicaciones
-      { barrio:"Palermo", ubicacion:"Palermo Soho", lat:-34.5883, lng:-58.4258, m2:10, seguro:true, dispo:"Inmediata", cal:5, img:"../img/1.jpg" },
-      { barrio:"Palermo", ubicacion:"Palermo Hollywood", lat:-34.5803, lng:-58.4308, m2:8, seguro:false, dispo:"Con reserva", cal:4, img:"https://images.unsplash.com/photo-1513584684374-8bab748fbf90?w=150&h=150&fit=crop" },
-      { barrio:"Palermo", ubicacion:"Las Cañitas", lat:-34.5753, lng:-58.4358, m2:12, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150&h=150&fit=crop" },
+      { barrio:"Palermo", ubicacion:"Palermo Soho", lat:-34.5883, lng:-58.4258, m2:10, seguro:true, dispo:"Inmediata", cal:5 },
+      { barrio:"Palermo", ubicacion:"Palermo Hollywood", lat:-34.5803, lng:-58.4308, m2:8, seguro:false, dispo:"Con reserva", cal:4 },
+      { barrio:"Palermo", ubicacion:"Las Cañitas", lat:-34.5753, lng:-58.4358, m2:12, seguro:true, dispo:"Inmediata", cal:5 },
       
       // Belgrano - 3 ubicaciones
-      { barrio:"Belgrano", ubicacion:"Belgrano R", lat:-34.5638, lng:-58.4566, m2:9, seguro:true, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=150&h=150&fit=crop" },
-      { barrio:"Belgrano", ubicacion:"Barrio Chino", lat:-34.5688, lng:-58.4466, m2:7, seguro:false, dispo:"No", cal:3, img:"https://images.unsplash.com/photo-1558036117-15e82a2c9a9a?w=150&h=150&fit=crop" },
-      { barrio:"Belgrano", ubicacion:"Belgrano C", lat:-34.5588, lng:-58.4516, m2:11, seguro:true, dispo:"Con reserva", cal:5, img:"https://images.unsplash.com/photo-1575517111716-6e7dd6e2e2c9?w=150&h=150&fit=crop" },
+      { barrio:"Belgrano", ubicacion:"Belgrano R", lat:-34.5638, lng:-58.4566, m2:9, seguro:true, dispo:"Inmediata", cal:4 },
+      { barrio:"Belgrano", ubicacion:"Barrio Chino", lat:-34.5688, lng:-58.4466, m2:7, seguro:false, dispo:"No", cal:3 },
+      { barrio:"Belgrano", ubicacion:"Belgrano C", lat:-34.5588, lng:-58.4516, m2:11, seguro:true, dispo:"Con reserva", cal:5 },
       
       // Caballito - 2 ubicaciones
-      { barrio:"Caballito", ubicacion:"Caballito Norte", lat:-34.6099, lng:-58.4436, m2:8, seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=150&h=150&fit=crop" },
-      { barrio:"Caballito", ubicacion:"Parque Centenario", lat:-34.6059, lng:-58.4336, m2:10, seguro:true, dispo:"Con reserva", cal:5, img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=150&h=150&fit=crop" },
+      { barrio:"Caballito", ubicacion:"Caballito Norte", lat:-34.6099, lng:-58.4436, m2:8, seguro:false, dispo:"Inmediata", cal:4 },
+      { barrio:"Caballito", ubicacion:"Parque Centenario", lat:-34.6059, lng:-58.4336, m2:10, seguro:true, dispo:"Con reserva", cal:5 },
       
       // San Telmo - 2 ubicaciones
-      { barrio:"San Telmo", ubicacion:"Plaza Dorrego", lat:-34.6153, lng:-58.3715, m2:6, seguro:false, dispo:"No", cal:3, img:"https://images.unsplash.com/photo-1575517111496-7d5adb5f5b55?w=150&h=150&fit=crop" },
-      { barrio:"San Telmo", ubicacion:"Monserrat", lat:-34.6103, lng:-58.3765, m2:9, seguro:true, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1560449752-5edda645aca0?w=150&h=150&fit=crop" },
+      { barrio:"San Telmo", ubicacion:"Plaza Dorrego", lat:-34.6153, lng:-58.3715, m2:6, seguro:false, dispo:"No", cal:3 },
+      { barrio:"San Telmo", ubicacion:"Monserrat", lat:-34.6103, lng:-58.3765, m2:9, seguro:true, dispo:"Inmediata", cal:4 },
       
       // Recoleta - 3 ubicaciones
-      { barrio:"Recoleta", ubicacion:"Recoleta Centro", lat:-34.5896, lng:-58.3940, m2:12, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=150&h=150&fit=crop" },
-      { barrio:"Recoleta", ubicacion:"Barrio Norte", lat:-34.5846, lng:-58.3990, m2:8, seguro:false, dispo:"Con reserva", cal:4, img:"https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=150&h=150&fit=crop" },
-      { barrio:"Recoleta", ubicacion:"Cementerio", lat:-34.5946, lng:-58.3890, m2:10, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1575517111476-7a41d5358b53?w=150&h=150&fit=crop" },
+      { barrio:"Recoleta", ubicacion:"Recoleta Centro", lat:-34.5896, lng:-58.3940, m2:12, seguro:true, dispo:"Inmediata", cal:5 },
+      { barrio:"Recoleta", ubicacion:"Barrio Norte", lat:-34.5846, lng:-58.3990, m2:8, seguro:false, dispo:"Con reserva", cal:4 },
+      { barrio:"Recoleta", ubicacion:"Cementerio", lat:-34.5946, lng:-58.3890, m2:10, seguro:true, dispo:"Inmediata", cal:5 },
       
       // Flores - 2 ubicaciones
-      { barrio:"Flores", ubicacion:"Flores Centro", lat:-34.6317, lng:-58.4622, m2:7, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=150&h=150&fit=crop" },
-      { barrio:"Flores", ubicacion:"Flores Sur", lat:-34.6367, lng:-58.4572, m2:9, seguro:false, dispo:"No", cal:3, img:"https://images.unsplash.com/photo-1558036117-15e82a2c9a9a?w=150&h=150&fit=crop" },
+      { barrio:"Flores", ubicacion:"Flores Centro", lat:-34.6317, lng:-58.4622, m2:7, seguro:true, dispo:"Inmediata", cal:5 },
+      { barrio:"Flores", ubicacion:"Flores Sur", lat:-34.6367, lng:-58.4572, m2:9, seguro:false, dispo:"No", cal:3 },
       
       // Villa Crespo - 2 ubicaciones
-      { barrio:"Villa Crespo", ubicacion:"Villa Crespo Norte", lat:-34.5991, lng:-58.4352, m2:5, seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1575517111716-6e7dd6e2e2c9?w=150&h=150&fit=crop" },
-      { barrio:"Villa Crespo", ubicacion:"Villa Crespo Sur", lat:-34.6041, lng:-58.4402, m2:8, seguro:true, dispo:"Con reserva", cal:5, img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=150&h=150&fit=crop" },
+      { barrio:"Villa Crespo", ubicacion:"Villa Crespo Norte", lat:-34.5991, lng:-58.4352, m2:5, seguro:false, dispo:"Inmediata", cal:4 },
+      { barrio:"Villa Crespo", ubicacion:"Villa Crespo Sur", lat:-34.6041, lng:-58.4402, m2:8, seguro:true, dispo:"Con reserva", cal:5 },
       
       // Almagro - 2 ubicaciones
-      { barrio:"Almagro", ubicacion:"Almagro Este", lat:-34.6072, lng:-58.4161, m2:11, seguro:true, dispo:"Con reserva", cal:3, img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=150&h=150&fit=crop" },
-      { barrio:"Almagro", ubicacion:"Almagro Oeste", lat:-34.6122, lng:-58.4211, m2:7, seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1575517111496-7d5adb5f5b55?w=150&h=150&fit=crop" },
+      { barrio:"Almagro", ubicacion:"Almagro Este", lat:-34.6072, lng:-58.4161, m2:11, seguro:true, dispo:"Con reserva", cal:3 },
+      { barrio:"Almagro", ubicacion:"Almagro Oeste", lat:-34.6122, lng:-58.4211, m2:7, seguro:false, dispo:"Inmediata", cal:4 },
       
       // Chacarita - 2 ubicaciones
-      { barrio:"Chacarita", ubicacion:"Chacarita Norte", lat:-34.5999, lng:-58.4494, m2:14, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1560449752-5edda645aca0?w=150&h=150&fit=crop" },
-      { barrio:"Chacarita", ubicacion:"Chacarita Sur", lat:-34.6049, lng:-58.4544, m2:10, seguro:false, dispo:"Con reserva", cal:4, img:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=150&h=150&fit=crop" },
+      { barrio:"Chacarita", ubicacion:"Chacarita Norte", lat:-34.5999, lng:-58.4494, m2:14, seguro:true, dispo:"Inmediata", cal:5 },
+      { barrio:"Chacarita", ubicacion:"Chacarita Sur", lat:-34.6049, lng:-58.4544, m2:10, seguro:false, dispo:"Con reserva", cal:4 },
       
       // Barracas - 2 ubicaciones
-      { barrio:"Barracas", ubicacion:"Barracas Norte", lat:-34.6281, lng:-58.3747, m2:10, seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=150&h=150&fit=crop" },
-      { barrio:"Barracas", ubicacion:"Barracas Sur", lat:-34.6331, lng:-58.3797, m2:8, seguro:true, dispo:"No", cal:3, img:"https://images.unsplash.com/photo-1575517111476-7a41d5358b53?w=150&h=150&fit=crop" }
+      { barrio:"Barracas", ubicacion:"Barracas Norte", lat:-34.6281, lng:-58.3747, m2:10, seguro:false, dispo:"Inmediata", cal:4 },
+      { barrio:"Barracas", ubicacion:"Barracas Sur", lat:-34.6331, lng:-58.3797, m2:8, seguro:true, dispo:"No", cal:3 }
     ];
+
+    // Asignar imágenes aleatorias a cada ubicación
+    places.forEach(place => {
+      place.img = getImagenAleatoria();
+    });
 
     // Inicializar mapa Leaflet (OpenStreetMap)
     const map = L.map('map').setView([-34.6037, -58.3816], 12);
@@ -489,7 +513,7 @@
       item.className = 'item';
       item.dataset.idx = idx;
       item.innerHTML = `
-        <img src="${imgSrc}" alt="${p.barrio}" onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150&h=150&fit=crop'">
+        <img src="${imgSrc}" alt="${p.barrio}" onerror="this.src='${getImagenAleatoria()}'">
         <div class="info">
           <div class="linea-superior">
             <span class="barrio">${p.barrio}</span>
@@ -571,7 +595,7 @@
       modalTitle.textContent = `${p.barrio} — ${p.ubicacion}`;
       const img = p.img;
       modalBody.innerHTML = `
-        <img src="${img}" alt="${p.barrio}" onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150&h=150&fit=crop'">
+        <img src="${img}" alt="${p.barrio}" onerror="this.src='${getImagenAleatoria()}'">
         <div class="info-row">
           <div><strong>Superficie</strong><div>${p.m2} m²</div></div>
           <div><strong>Precio</strong><div>USD ${price(p.m2)}/mes</div></div>
@@ -621,7 +645,7 @@
       modalTitle.textContent = `Reservar — ${p.barrio} - ${p.ubicacion}`;
       const img = p.img;
       modalBody.innerHTML = `
-        <img src="${img}" alt="${p.barrio}" onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150&h=150&fit=crop'">
+        <img src="${img}" alt="${p.barrio}" onerror="this.src='${getImagenAleatoria()}'">
         <p style="margin:8px 0 0;color:#333;font-size:12px">Contrato mínimo: 1 mes. Depósito: 1 mes. Precio: <strong>USD ${price(p.m2)}/mes</strong>.</p>
         <form id="resForm" class="form">
           <label style="font-size:11px;color:#555;margin-top:8px">Nombre</label>
@@ -668,9 +692,6 @@
   </script>
 </body>
 </html>
-
-
-
 
 
 
