@@ -258,13 +258,8 @@
       font-size: 14px;
     }
 
-    .acciones-modal .reservar {
-      background-color: #2196f3;
-    }
-
-    .acciones-modal .favorito {
-      background-color: #e91e63;
-    }
+    .acciones-modal .reservar { background-color: #2196f3; }
+    .acciones-modal .favorito { background-color: #e91e63; }
 
     .cerrar {
       position: absolute;
@@ -273,6 +268,30 @@
       font-size: 20px;
       cursor: pointer;
       color: #333;
+    }
+
+    /* Formulario de reserva */
+    .formulario {
+      margin: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .formulario.active { display: flex; }
+
+    .formulario input, .formulario select, .formulario button {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .formulario button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -334,15 +353,31 @@
         <div class="boton-android menu"></div>
       </div>
 
+      <!-- Modal -->
       <div class="modal" id="modal">
         <span class="cerrar" id="cerrarModal">&times;</span>
         <img id="modalImg" src="" alt="Habitación">
         <h2 id="modalTitulo"></h2>
         <p id="modalDesc"></p>
+
         <div class="acciones-modal">
-          <button class="reservar">Reservar</button>
+          <button class="reservar" id="btnReservar">Reservar</button>
           <button class="favorito">❤️</button>
         </div>
+
+        <form class="formulario" id="formulario">
+          <input type="text" placeholder="Nombre completo" required>
+          <label>Fecha de inicio</label>
+          <input type="date" required>
+          <label>Duración (meses)</label>
+          <select required>
+            <option value="">Seleccionar...</option>
+            <option value="1">1 mes</option>
+            <option value="3">3 meses</option>
+            <option value="6">6 meses</option>
+          </select>
+          <button type="submit">Enviar solicitud</button>
+        </form>
       </div>
     </div>
   </div>
@@ -354,7 +389,6 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // marcadores de ejemplo
     const marcadores = [
       [-34.6037, -58.3816],
       [-34.598, -58.435],
@@ -362,7 +396,9 @@
     ];
     marcadores.forEach(c => L.marker(c).addTo(map));
 
-    // seleccionar item
+    const modal = document.getElementById('modal');
+    const form = document.getElementById('formulario');
+
     document.querySelectorAll('.item').forEach(item => {
       item.addEventListener('click', () => {
         const lat = item.dataset.lat;
@@ -373,21 +409,33 @@
       item.querySelectorAll('.preguntar, .reservar').forEach(btn => {
         btn.addEventListener('click', e => {
           e.stopPropagation();
-          const modal = document.getElementById('modal');
           document.getElementById('modalImg').src = item.dataset.img;
           document.getElementById('modalTitulo').innerText = item.dataset.titulo;
           document.getElementById('modalDesc').innerText = item.dataset.desc;
           modal.classList.add('active');
+          form.classList.remove('active');
         });
       });
     });
 
     document.getElementById('cerrarModal').addEventListener('click', () => {
-      document.getElementById('modal').classList.remove('active');
+      modal.classList.remove('active');
+      form.classList.remove('active');
+    });
+
+    document.getElementById('btnReservar').addEventListener('click', () => {
+      form.classList.toggle('active');
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      alert('Solicitud enviada correctamente.');
+      modal.classList.remove('active');
     });
   </script>
 </body>
 </html>
+
 
 
 
