@@ -49,9 +49,6 @@
       position: relative;
     }
 
-    /* top notch removed visually, but keep notch element if needed */
-    .notch { display: none; }
-
     /* usuario arriba derecha */
     .usuario {
       position: absolute;
@@ -121,50 +118,77 @@
       padding-bottom: 45px;
     }
 
-    /* ITEMS MÁS PEQUEÑOS */
+    /* NUEVO DISEÑO DE ITEMS */
     .item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       background: white;
       border-radius: 8px;
-      padding: 5px;
-      margin-bottom: 5px;
+      padding: 8px;
+      margin-bottom: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      gap: 5px;
+      gap: 10px;
       cursor: pointer;
     }
 
     .item img {
-      width: 45px;
-      height: 45px;
+      width: 60px;
+      height: 60px;
       border-radius: 6px;
       object-fit: cover;
       flex-shrink: 0;
     }
 
     .info {
-      font-size: 10px;
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
-    .info strong { 
-      display: block; 
+
+    .linea-superior {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .barrio {
+      color: #333;
+      font-size: 13px;
+    }
+
+    .m2 {
+      color: #666;
       font-size: 11px;
-      color: #333; 
+    }
+
+    .precio {
+      font-size: 12px;
+      color: #2196f3;
+      font-weight: bold;
+    }
+
+    .detalles {
+      font-size: 10px;
+      color: #666;
+      line-height: 1.2;
     }
 
     .acciones {
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      margin-left: 3px;
+      gap: 4px;
     }
     .acciones button {
-      font-size: 9px;
-      padding: 3px 5px;
+      font-size: 10px;
+      padding: 5px 8px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       color: white;
+      min-width: 60px;
     }
     .acciones .consultar { background: #2196f3; }
     .acciones .reservar  { background: #4caf50; }
@@ -344,16 +368,16 @@
   <script>
     // Datos: 10 barrios en Capital Federal con coordenadas aproximadas
     const places = [
-      { barrio:"Palermo", lat:-34.5883, lng:-58.4108, m2:10, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1556909114-4d0d853e5e15?w=150&h=150&fit=crop" },
-      { barrio:"Belgrano", lat:-34.5638, lng:-58.4416, m2:8,  seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1585739918745-864d2b2c4d8c?w=150&h=150&fit=crop" },
-      { barrio:"Caballito", lat:-34.6099, lng:-58.4336, m2:12, seguro:true, dispo:"Con reserva", cal:5, img:"https://images.unsplash.com/photo-1556909114-4d0d853e5e15?w=150&h=150&fit=crop" },
-      { barrio:"San Telmo", lat:-34.6153, lng:-58.3665, m2:6,  seguro:false, dispo:"No", cal:3, img:"https://images.unsplash.com/photo-1585739918745-864d2b2c4d8c?w=150&h=150&fit=crop" },
-      { barrio:"Recoleta", lat:-34.5896, lng:-58.3890, m2:9,  seguro:true, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1556909114-4d0d853e5e15?w=150&h=150&fit=crop" },
-      { barrio:"Flores", lat:-34.6317, lng:-58.4522, m2:7,  seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1585739918745-864d2b2c4d8c?w=150&h=150&fit=crop" },
-      { barrio:"Villa Crespo", lat:-34.5991, lng:-58.4302, m2:5,  seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1556909114-4d0d853e5e15?w=150&h=150&fit=crop" },
-      { barrio:"Almagro", lat:-34.6072, lng:-58.4211, m2:11, seguro:true, dispo:"Con reserva", cal:3, img:"https://images.unsplash.com/photo-1585739918745-864d2b2c4d8c?w=150&h=150&fit=crop" },
-      { barrio:"Chacarita", lat:-34.5999, lng:-58.4444, m2:14, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1556909114-4d0d853e5e15?w=150&h=150&fit=crop" },
-      { barrio:"Barracas", lat:-34.6281, lng:-58.3697, m2:10, seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1585739918745-864d2b2c4d8c?w=150&h=150&fit=crop" }
+      { barrio:"Palermo", lat:-34.5883, lng:-58.4108, m2:10, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop" },
+      { barrio:"Belgrano", lat:-34.5638, lng:-58.4416, m2:8,  seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1513584684374-8bab748fbf90?w=150&h=150&fit=crop" },
+      { barrio:"Caballito", lat:-34.6099, lng:-58.4336, m2:12, seguro:true, dispo:"Con reserva", cal:5, img:"https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150&h=150&fit=crop" },
+      { barrio:"San Telmo", lat:-34.6153, lng:-58.3665, m2:6,  seguro:false, dispo:"No", cal:3, img:"https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=150&h=150&fit=crop" },
+      { barrio:"Recoleta", lat:-34.5896, lng:-58.3890, m2:9,  seguro:true, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1558036117-15e82a2c9a9a?w=150&h=150&fit=crop" },
+      { barrio:"Flores", lat:-34.6317, lng:-58.4522, m2:7,  seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1575517111716-6e7dd6e2e2c9?w=150&h=150&fit=crop" },
+      { barrio:"Villa Crespo", lat:-34.5991, lng:-58.4302, m2:5,  seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=150&h=150&fit=crop" },
+      { barrio:"Almagro", lat:-34.6072, lng:-58.4211, m2:11, seguro:true, dispo:"Con reserva", cal:3, img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=150&h=150&fit=crop" },
+      { barrio:"Chacarita", lat:-34.5999, lng:-58.4444, m2:14, seguro:true, dispo:"Inmediata", cal:5, img:"https://images.unsplash.com/photo-1575517111496-7d5adb5f5b55?w=150&h=150&fit=crop" },
+      { barrio:"Barracas", lat:-34.6281, lng:-58.3697, m2:10, seguro:false, dispo:"Inmediata", cal:4, img:"https://images.unsplash.com/photo-1560449752-5edda645aca0?w=150&h=150&fit=crop" }
     ];
 
     // Inicializar mapa Leaflet (OpenStreetMap)
@@ -396,7 +420,7 @@
       });
       markers[idx] = m;
 
-      // listado (estilo compacto - SIN ESTRELLAS DE CALIFICACIÓN)
+      // NUEVO DISEÑO DE ITEMS
       const imgSrc = p.img;
       const item = document.createElement('div');
       item.className = 'item';
@@ -404,9 +428,12 @@
       item.innerHTML = `
         <img src="${imgSrc}" alt="${p.barrio}">
         <div class="info">
-          <strong>${p.barrio}</strong>
-          USD ${price(p.m2)}/mes<br>
-          ${p.seguro ? 'Requiere seguro' : 'Sin seguro obligatorio'} - ${p.dispo}
+          <div class="linea-superior">
+            <span class="barrio">${p.barrio}</span>
+            <span class="m2">${p.m2} m²</span>
+          </div>
+          <div class="precio">USD ${price(p.m2)}/mes</div>
+          <div class="detalles">${p.seguro ? 'Requiere seguro' : 'Sin seguro obligatorio'} - ${p.dispo}</div>
         </div>
         <div class="acciones">
           <button class="consultar">Consultar</button>
