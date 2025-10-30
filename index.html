@@ -4,405 +4,228 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GuardaCerca - Mockup</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
     body {
-      background: #ccc;
       display: flex;
       justify-content: center;
       align-items: center;
+      background-color: #e5e7eb;
       height: 100vh;
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      overflow: hidden;
+      font-family: "Verdana", sans-serif;
     }
 
-    .telefono {
-      width: 340px;
-      height: 680px;
-      background: #111;
-      border-radius: 30px;
-      padding: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    /* Mockup Samsung A15 */
+    .phone {
       position: relative;
-      border: 8px solid #000;
-      transform: scale(0.95);
-    }
-
-    .pantalla {
-      background: #fff;
-      border-radius: 25px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
+      width: 380px;
+      height: 820px;
+      background-color: #fff;
+      border: 12px solid #000;
+      border-radius: 40px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
       overflow: hidden;
-      position: relative;
     }
 
-    .notch {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px;
-      height: 15px;
+    .status-bar {
+      height: 30px;
       background: #000;
-      border-radius: 10px;
-      z-index: 1001;
     }
 
-    .usuario {
-      position: absolute;
-      top: 10px;
-      right: 10px;
+    .app {
       display: flex;
-      align-items: center;
-      gap: 5px;
-      z-index: 1002;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 20px;
-      padding: 3px 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-      font-size: 12px;
+      flex-direction: column;
+      height: calc(100% - 30px);
     }
 
-    .usuario img {
-      width: 20px;
-      height: 20px;
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #2563eb;
+      color: #fff;
+      padding: 10px 15px;
+    }
+
+    header img {
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
+      border: 1px solid #fff;
     }
 
-    #map {
-      flex: 2;
-      width: 100%;
-      height: 55%;
+    header h1 {
+      font-size: 1rem;
+      margin: 0;
     }
 
-    .buscador {
-      position: absolute;
-      top: 12px;
-      left: 10px;
-      z-index: 1002;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 5px 10px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .buscador input {
-      border: none;
-      outline: none;
-      padding: 4px;
-      border-radius: 5px;
-      width: 120px;
-    }
-
-    .buscador button {
-      background: #2196f3;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 5px 8px;
-      cursor: pointer;
-    }
-
-    .listado {
+    .content {
       flex: 1;
       overflow-y: auto;
       padding: 10px;
-      background: #f8f8f8;
-      padding-bottom: 50px;
     }
 
-    .item {
-      display: flex;
-      align-items: center;
-      background: white;
+    .map {
+      height: 250px;
       border-radius: 10px;
-      padding: 8px;
-      margin-bottom: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-    }
-
-    .item img {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      margin-right: 10px;
-      object-fit: cover;
-    }
-
-    .info {
-      font-size: 12px;
-      flex: 1;
-    }
-
-    .info strong {
-      display: block;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .acciones {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .acciones button {
-      font-size: 10px;
-      padding: 4px 6px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: white;
-    }
-
-    .acciones .preguntar {
-      background-color: #4caf50;
-    }
-
-    .acciones .consultar {
-      background-color: #2196f3;
-    }
-
-    .botones-android {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 40px;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 50px;
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
-      z-index: 1003;
-    }
-
-    .boton-android {
-      width: 20px;
-      height: 20px;
-      opacity: 0.8;
-    }
-
-    .boton-android.atras::before {
-      content: "<";
-      font-size: 20px;
-      color: white;
-      display: block;
-      text-align: center;
-    }
-
-    .boton-android.home {
-      border: 2px solid white;
-      border-radius: 5px;
-    }
-
-    .boton-android.menu {
-      width: 18px;
-      height: 2px;
-      background: white;
-      position: relative;
-    }
-
-    .boton-android.menu::before,
-    .boton-android.menu::after {
-      content: "";
-      width: 18px;
-      height: 2px;
-      background: white;
-      position: absolute;
-      left: 0;
-    }
-
-    .boton-android.menu::before { top: -6px; }
-    .boton-android.menu::after { top: 6px; }
-
-    /* Modal general */
-    .modal {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      z-index: 2000;
-      display: none;
-      flex-direction: column;
-      border-radius: 25px;
-      overflow-y: auto;
-    }
-
-    .modal.active { display: flex; }
-
-    .cerrar {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 22px;
-      cursor: pointer;
-      color: #333;
-    }
-
-    .modal-content {
-      margin: 20px;
-      font-size: 14px;
-    }
-
-    .modal-content h2 {
-      font-size: 18px;
       margin-bottom: 10px;
     }
 
-    .estrellas {
-      color: gold;
-      font-size: 16px;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 10px;
+    }
+
+    .baulera {
+      background: #f3f4f6;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .baulera h3 {
+      margin: 0;
+      color: #1e3a8a;
+    }
+
+    .baulera p {
+      margin: 5px 0;
+      font-size: 0.9rem;
+    }
+
+    .stars {
+      color: #facc15;
+    }
+
+    .bottom-bar {
+      display: flex;
+      justify-content: space-around;
+      background-color: #1d4ed8;
+      padding: 10px 0;
+    }
+
+    .bottom-bar button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
     }
 
     .formulario {
-      display: flex;
+      display: none;
       flex-direction: column;
-      gap: 10px;
-      margin: 20px;
+      padding: 15px;
+      background: #f9fafb;
     }
 
-    .formulario input, .formulario textarea, .formulario button {
+    .formulario input,
+    .formulario textarea {
+      margin-bottom: 10px;
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 14px;
     }
 
     .formulario button {
-      background: #4caf50;
+      background: #2563eb;
       color: white;
+      padding: 10px;
       border: none;
+      border-radius: 6px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="telefono">
-    <div class="pantalla">
-      <div class="notch"></div>
-      <div class="usuario">
-        <img src="https://i.pravatar.cc/30" alt="Usuario" />
-        <span>Nahuel</span>
-      </div>
-      <div id="map"></div>
+  <div class="phone">
+    <div class="status-bar"></div>
+    <div class="app">
+      <header>
+        <h1>GuardaCerca</h1>
+        <div>
+          <img src="https://i.pravatar.cc/50?u=usuario" alt="Usuario" />
+          <span style="font-size: 0.8rem;">Nahuel</span>
+        </div>
+      </header>
 
-      <div class="buscador">
-        <input type="text" placeholder="Buscar zona..." />
-        <button>🔍</button>
-      </div>
-
-      <div class="listado">
-        <div class="item" data-zona="Villa Crespo" data-m2="9" data-seguro="No" data-dispo="Inmediata" data-calif="⭐⭐⭐⭐" data-img="img/1.jpg">
-          <img src="img/1.jpg" alt="Baulera" />
-          <div class="info">
-            <strong>Villa Crespo</strong>
-            9 m² - $225/mes<br>
-            Disponibilidad inmediata
-          </div>
-          <div class="acciones">
-            <button class="preguntar">Preguntar</button>
-            <button class="consultar">Consultar</button>
-          </div>
+      <div class="content" id="mainContent">
+        <div class="map">
+          <iframe
+            src="https://www.google.com/maps/d/embed?mid=1zFSvVnI_LdXbQKSlXxwXr2sNwhnWQOA&ehbc=2E312F"
+            allowfullscreen
+          ></iframe>
         </div>
 
-        <div class="item" data-zona="Palermo" data-m2="12" data-seguro="Sí" data-dispo="Con reserva" data-calif="⭐⭐⭐" data-img="img/2.jfif">
-          <img src="img/2.jfif" alt="Baulera" />
-          <div class="info">
-            <strong>Palermo</strong>
-            12 m² - $300/mes<br>
-            Requiere seguro
-          </div>
-          <div class="acciones">
-            <button class="preguntar">Preguntar</button>
-            <button class="consultar">Consultar</button>
-          </div>
+        <div id="listadoBauleras">
+          <!-- Bauleras -->
         </div>
       </div>
 
-      <div class="botones-android">
-        <div class="boton-android atras"></div>
-        <div class="boton-android home"></div>
-        <div class="boton-android menu"></div>
+      <div class="formulario" id="formPregunta">
+        <h3>Enviar Pregunta</h3>
+        <input type="text" placeholder="Asunto" />
+        <textarea rows="4" placeholder="Escribe tu pregunta..."></textarea>
+        <button onclick="cerrarFormulario()">Enviar</button>
       </div>
 
-      <!-- Modal -->
-      <div class="modal" id="modal">
-        <span class="cerrar" id="cerrarModal">&times;</span>
-        <div class="modal-content" id="modalContent"></div>
+      <div class="bottom-bar">
+        <button onclick="mostrarListado()">Consultar</button>
+        <button onclick="mostrarFormulario()">Preguntar</button>
       </div>
     </div>
   </div>
 
   <script>
-    const modal = document.getElementById("modal");
-    const modalContent = document.getElementById("modalContent");
-    const cerrarModal = document.getElementById("cerrarModal");
+    const bauleras = [
+      { nombre: "Baulera 1", m2: 8, seguro: "Sí", disponible: "Sí", calificacion: 4 },
+      { nombre: "Baulera 2", m2: 10, seguro: "No", disponible: "No", calificacion: 3 },
+      { nombre: "Baulera 3", m2: 6, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera 4", m2: 12, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera 5", m2: 9, seguro: "No", disponible: "Sí", calificacion: 4 },
+      { nombre: "Baulera 6", m2: 15, seguro: "Sí", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera 7", m2: 7, seguro: "No", disponible: "Sí", calificacion: 4 },
+      { nombre: "Baulera 8", m2: 11, seguro: "Sí", disponible: "No", calificacion: 3 },
+      { nombre: "Baulera 9", m2: 5, seguro: "No", disponible: "Sí", calificacion: 5 },
+      { nombre: "Baulera 10", m2: 14, seguro: "Sí", disponible: "Sí", calificacion: 5 }
+    ];
 
-    document.querySelectorAll(".consultar").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const item = e.target.closest(".item");
-        const zona = item.dataset.zona;
-        const m2 = parseInt(item.dataset.m2);
-        const precio = m2 * 25;
-        const seguro = item.dataset.seguro;
-        const dispo = item.dataset.dispo;
-        const calif = item.dataset.calif;
-
-        modalContent.innerHTML = `
-          <h2>${zona}</h2>
-          <img src="${item.dataset.img}" style="width:100%;border-radius:10px;margin-bottom:10px;">
-          <p><strong>Superficie:</strong> ${m2} m²</p>
-          <p><strong>Precio:</strong> USD ${precio}/mes</p>
-          <p><strong>Seguro requerido:</strong> ${seguro}</p>
-          <p><strong>Disponibilidad:</strong> ${dispo}</p>
-          <p><strong>Calificación:</strong> <span class="estrellas">${calif}</span></p>
-          <p><em>Usuario logueado: Nahuel</em></p>
+    function renderBauleras() {
+      const cont = document.getElementById("listadoBauleras");
+      cont.innerHTML = "";
+      bauleras.forEach((b) => {
+        cont.innerHTML += `
+          <div class="baulera">
+            <h3>${b.nombre}</h3>
+            <p>Metros cuadrados: ${b.m2} m²</p>
+            <p>Precio: USD ${(b.m2 * 25).toFixed(2)}</p>
+            <p>Seguro: ${b.seguro}</p>
+            <p>Disponibilidad: ${b.disponible}</p>
+            <p>Calificación: <span class="stars">${"★".repeat(b.calificacion)}${"☆".repeat(5 - b.calificacion)}</span></p>
+          </div>
         `;
-        modal.classList.add("active");
       });
-    });
+    }
 
-    document.querySelectorAll(".preguntar").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const item = e.target.closest(".item");
-        const zona = item.dataset.zona;
-        modalContent.innerHTML = `
-          <h2>Consulta sobre baulera en ${zona}</h2>
-          <form class="formulario">
-            <label>Tu pregunta:</label>
-            <textarea rows="4" placeholder="Escribí tu consulta..." required></textarea>
-            <button type="submit">Enviar</button>
-          </form>
-          <p style="margin-left:10px;"><em>Usuario logueado: Nahuel</em></p>
-        `;
-        modal.classList.add("active");
-        modalContent.querySelector("form").addEventListener("submit", (ev) => {
-          ev.preventDefault();
-          alert("Consulta enviada correctamente.");
-          modal.classList.remove("active");
-        });
-      });
-    });
+    function mostrarFormulario() {
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("formPregunta").style.display = "flex";
+    }
 
-    cerrarModal.addEventListener("click", () => modal.classList.remove("active"));
+    function cerrarFormulario() {
+      alert("Pregunta enviada correctamente.");
+      document.getElementById("formPregunta").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    }
+
+    function mostrarListado() {
+      document.getElementById("formPregunta").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    }
+
+    renderBauleras();
   </script>
 </body>
 </html>
