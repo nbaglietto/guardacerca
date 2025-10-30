@@ -1,6 +1,6 @@
 <style>
   /* === NUEVO: pantalla detalle === */
-  .pantalla-detalle {
+  .pantalla-detalle, .pantalla-reserva {
     position: absolute;
     top: 0;
     left: 0;
@@ -15,34 +15,34 @@
     z-index: 2000;
   }
 
-  .pantalla-detalle.activa {
+  .pantalla-detalle.activa, .pantalla-reserva.activa {
     display: flex;
   }
 
-  .pantalla-detalle img {
+  .pantalla-detalle img, .pantalla-reserva img {
     width: 100%;
     height: 220px;
     object-fit: cover;
   }
 
-  .detalle-info {
+  .detalle-info, .reserva-info {
     padding: 15px;
     font-size: 14px;
     color: #333;
   }
 
-  .detalle-info h2 {
+  .detalle-info h2, .reserva-info h2 {
     margin-top: 0;
   }
 
-  .acciones-detalle {
+  .acciones-detalle, .acciones-reserva {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 15px;
   }
 
-  .btn-reservar {
+  .btn-reservar, .btn-confirmar {
     background: #2196f3;
     color: white;
     border: none;
@@ -62,7 +62,7 @@
     color: red;
   }
 
-  .cerrar-detalle {
+  .cerrar-detalle, .volver-reserva {
     position: absolute;
     top: 10px;
     right: 15px;
@@ -74,6 +74,30 @@
     height: 30px;
     font-size: 18px;
     cursor: pointer;
+  }
+
+  .volver-reserva {
+    left: 15px;
+    right: auto;
+  }
+
+  .form-reserva {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 10px 15px;
+  }
+
+  .form-reserva label {
+    font-size: 13px;
+    color: #555;
+  }
+
+  .form-reserva input, .form-reserva select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
   }
 
   @keyframes fadeIn {
@@ -108,11 +132,16 @@
     }
   });
 
-  // === Crear y manejar pantalla de detalle ===
+  // === Crear pantallas ===
   const detalle = document.createElement("div");
   detalle.classList.add("pantalla-detalle");
   document.body.appendChild(detalle);
 
+  const reserva = document.createElement("div");
+  reserva.classList.add("pantalla-reserva");
+  document.body.appendChild(reserva);
+
+  // === Mostrar detalle ===
   function mostrarDetalle(nombre, imgSrc) {
     detalle.innerHTML = `
       <button class="cerrar-detalle">✕</button>
@@ -136,6 +165,53 @@
       corazon.classList.toggle("activo");
       corazon.innerText = corazon.classList.contains("activo") ? "❤️" : "♡";
     });
+
+    // abrir pantalla de reserva
+    detalle.querySelector(".btn-reservar").onclick = () => {
+      detalle.classList.remove("activa");
+      mostrarPantallaReserva(nombre, imgSrc);
+    };
+  }
+
+  // === Mostrar pantalla de confirmación ===
+  function mostrarPantallaReserva(nombre, imgSrc) {
+    reserva.innerHTML = `
+      <button class="volver-reserva">←</button>
+      <img src="${imgSrc}" alt="${nombre}">
+      <div class="reserva-info">
+        <h2>Confirmar Reserva</h2>
+        <p><strong>${nombre}</strong></p>
+      </div>
+      <form class="form-reserva">
+        <label>Nombre completo:</label>
+        <input type="text" placeholder="Tu nombre" required>
+
+        <label>Fecha de ingreso:</label>
+        <input type="date" required>
+
+        <label>Duración (meses):</label>
+        <select>
+          <option value="1">1 mes</option>
+          <option value="3">3 meses</option>
+          <option value="6">6 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+
+        <button type="submit" class="btn-confirmar">Confirmar Reserva</button>
+      </form>
+    `;
+    reserva.classList.add("activa");
+
+    reserva.querySelector(".volver-reserva").onclick = () => {
+      reserva.classList.remove("activa");
+      detalle.classList.add("activa");
+    };
+
+    reserva.querySelector(".form-reserva").onsubmit = e => {
+      e.preventDefault();
+      alert("✅ Reserva confirmada para " + nombre + "!");
+      reserva.classList.remove("activa");
+    };
   }
 
   // === Eventos para botones "preguntar" y "reservar" ===
