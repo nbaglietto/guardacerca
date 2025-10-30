@@ -1,419 +1,460 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GuardaCerca - Mockup (Leaflet)</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GuardaCerca - Mockup</title>
 
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <style>
-    :root{
-      --primary:#2563eb;
-      --accent:#4caf50;
-      --bg:#e6eefc;
-    }
-    html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;background:var(--bg);display:flex;align-items:center;justify-content:center;}
-    /* Mockup Samsung A15 (sin cámara) */
-    .phone {
-      width: 380px;
-      height: 820px;
-      border-radius: 36px;
-      background:#111;
-      padding:12px;
-      box-sizing:border-box;
+    /* Basado en tu mockup original (Samsung A15) */
+    body {
+      background: #ccc;
       display:flex;
-      align-items:center;
       justify-content:center;
-      box-shadow:0 12px 40px rgba(0,0,0,0.45);
+      align-items:center;
+      height:100vh;
+      margin:0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .telefono {
+      width: 360px;
+      height: 780px;
+      background: #111;
+      border-radius: 35px;
+      padding: 10px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
       border: 8px solid #000;
     }
 
-    .screen {
-      width: 100%;
-      height: 100%;
+    .pantalla {
       background:#fff;
-      border-radius: 24px;
-      overflow:hidden;
+      border-radius:25px;
+      flex-grow:1;
       display:flex;
       flex-direction:column;
+      overflow:hidden;
       position:relative;
     }
 
-    /* top bar (no cámara) */
-    .topbar{
-      height:48px;
-      background:var(--primary);
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 12px;
-      box-sizing:border-box;
-      gap:8px;
-    }
-    .topbar h1{font-size:16px;margin:0;font-weight:600;}
-    .user {
-      display:flex;
-      align-items:center;
-      gap:8px;
-      background:rgba(255,255,255,0.08);
+    /* top notch removed visually, but keep notch element if needed */
+    .notch { display:none; }
+
+    /* usuario arriba derecha */
+    .usuario {
+      position:absolute;
+      top:10px;
+      right:10px;
+      z-index:1005;
+      background:rgba(255,255,255,0.95);
       padding:4px 8px;
       border-radius:18px;
-      font-size:13px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      box-shadow:0 1px 4px rgba(0,0,0,0.15);
+      font-size:12px;
     }
-    .user img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.12);}
+    .usuario img { width:24px; height:24px; border-radius:50%; object-fit:cover; }
 
-    /* content layout */
-    .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
-    .map-wrapper{height:250px;border-radius:10px;margin:12px;background:#ddd;overflow:hidden}
-    #map{width:100%;height:100%}
-
-    .controls{display:flex;justify-content:space-between;padding:0 12px 6px}
-    .controls .search{
-      display:flex;gap:6px;align-items:center;
-      background:#fff;border-radius:8px;padding:6px 8px;border:1px solid #e6e9ef;box-shadow:0 1px 3px rgba(0,0,0,0.04)
+    /* mapa */
+    #map {
+      width:100%;
+      height: 55%;
+      z-index:1;
     }
-    .controls input{border:none;outline:none;font-size:13px}
-    .controls button{background:var(--primary);border:none;color:#fff;padding:7px 10px;border-radius:8px;cursor:pointer}
 
-    /* listado */
-    .list {flex:1; overflow:auto; padding:10px; background:#f7fafc;}
-    .card{
-      display:flex; gap:10px; background:#fff;border-radius:10px;padding:8px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,0.04); align-items:flex-start;
+    .buscador {
+      position:absolute;
+      top:12px;
+      left:12px;
+      z-index:1006;
+      background: rgba(255,255,255,0.95);
+      padding:6px 10px;
+      border-radius:10px;
+      display:flex;
+      gap:6px;
+      align-items:center;
+      box-shadow:0 1px 4px rgba(0,0,0,0.2);
+    }
+    .buscador input {
+      border:none;
+      outline:none;
+      padding:6px;
+      border-radius:6px;
+      width:150px;
+    }
+    .buscador button {
+      background:#2196f3;
+      color:white;
+      border:none;
+      border-radius:6px;
+      padding:6px 8px;
       cursor:pointer;
     }
-    .card img{width:88px;height:72px;border-radius:8px;object-fit:cover;flex-shrink:0}
-    .card .meta{flex:1}
-    .card h3{margin:0;font-size:14px;color:#0f172a}
-    .card p{margin:4px 0;font-size:12px;color:#475569}
-    .card .price{font-weight:700;color:#0b69d0}
-    .card .badges{display:flex;gap:6px;margin-top:6px}
-    .badge{font-size:11px;padding:4px 6px;border-radius:8px;background:#eef2ff;color:#1e3a8a}
 
-    .actions{display:flex;flex-direction:column;gap:6px}
-    .actions button{font-size:12px;padding:6px 8px;border-radius:8px;border:none;color:#fff;cursor:pointer}
-    .btn-consultar{background:var(--primary)}
-    .btn-preguntar{background:var(--accent)}
+    /* listado estilo original */
+    .listado {
+      flex:1;
+      overflow-y:auto;
+      padding:10px;
+      background:#f8f8f8;
+      padding-bottom:55px;
+    }
 
-    /* modal (detalle / preguntar / reservar) */
-    .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:50}
-    .modal{width:320px;max-height:86%;background:#fff;border-radius:12px;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
-    .modal .header{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eef2f6}
-    .modal .body{padding:12px}
-    .close{background:none;border:none;font-size:18px;cursor:pointer}
-    .modal img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+    .item {
+      display:flex;
+      align-items:center;
+      background:white;
+      border-radius:10px;
+      padding:8px;
+      margin-bottom:8px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.1);
+      gap:8px;
+      cursor:pointer;
+    }
 
-    .info-row{display:flex;justify-content:space-between;gap:8px;margin:8px 0;font-size:13px}
-    .stars{color:#f59e0b;font-size:14px}
-    .reserve-actions{display:flex;gap:8px;margin-top:10px}
-    .heart{font-size:20px;cursor:pointer;border:none;background:none}
-    .heart.active{color:#e11d48}
+    .item img {
+      width:64px;
+      height:64px;
+      border-radius:8px;
+      object-fit:cover;
+      flex-shrink:0;
+    }
 
-    /* form */
-    .form input,.form textarea,.form select{width:100%;padding:8px;border:1px solid #e6eef7;border-radius:8px;margin-top:8px;font-size:13px}
-    .form button{margin-top:10px;padding:10px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer}
+    .info {
+      font-size:12px;
+      flex:1;
+    }
+    .info strong { display:block; font-size:13px; color:#333; }
 
-    /* small responsive tweaks inside phone */
-    @media (max-width:420px){
-      .modal{width:300px}
+    .acciones {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-left:6px;
+    }
+    .acciones button {
+      font-size:11px;
+      padding:6px 8px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      color:white;
+    }
+    .acciones .consultar { background:#2196f3; }
+    .acciones .reservar  { background:#4caf50; }
+
+    /* barra inferior Android (estética) */
+    .botones-android {
+      position:absolute;
+      bottom:0;
+      left:0;
+      width:100%;
+      height:45px;
+      background:#000;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:50px;
+      border-bottom-left-radius:25px;
+      border-bottom-right-radius:25px;
+      z-index:1003;
+    }
+    .boton-android { width:22px; height:22px; opacity:0.8; }
+    .boton-android.atras::before { content:"<"; font-size:22px; color:white; display:block; text-align:center; }
+    .boton-android.home { border:2px solid white; border-radius:5px; }
+    .boton-android.menu { width:18px; height:2px; background:white; position:relative; }
+    .boton-android.menu::before, .boton-android.menu::after { content:""; width:18px; height:2px; background:white; position:absolute; left:0; }
+    .boton-android.menu::before { top:-6px; } .boton-android.menu::after{ top:6px; }
+
+    /* modal / detalle / reservar */
+    .modal-bg {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.45); z-index:2000;
+    }
+    .modal {
+      width:320px; max-height:86%; background:white; border-radius:12px; overflow:auto; box-shadow:0 8px 30px rgba(0,0,0,0.3);
+    }
+    .modal .header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid #eee; }
+    .modal .body { padding:12px; font-size:13px; color:#333; }
+    .modal img { width:100%; height:160px; object-fit:cover; border-radius:8px; }
+
+    .info-row { display:flex; justify-content:space-between; gap:8px; margin-top:8px; font-size:13px; }
+    .stars { color:gold; }
+
+    .form input, .form select, .form textarea { width:100%; padding:8px; margin-top:8px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box; }
+    .form button { margin-top:10px; padding:10px; border-radius:8px; border:none; background:#111; color:white; cursor:pointer; width:100%; }
+
+    /* asegurar que elementos importantes estén visibles en pantalla pequeña */
+    @media (max-height:800px) {
+      .modal { width:300px; }
+      .modal img { height:140px; }
     }
   </style>
 </head>
 <body>
-  <div class="phone" role="application" aria-label="Mockup Samsung A15">
-    <div class="screen">
-      <div class="topbar">
-        <h1>GuardaCerca</h1>
-        <div class="user" title="Usuario logueado">
-          <img id="avatar" src="https://i.pravatar.cc/100?u=nahuel" alt="Nahuel">
-          <span id="username">Nahuel</span>
-        </div>
+  <div class="telefono">
+    <div class="pantalla">
+      <div class="usuario" title="Usuario logueado">
+        <img src="https://i.pravatar.cc/40?u=nahuel" alt="Nahuel">
+        <span>Nahuel</span>
       </div>
 
-      <div class="content">
-        <div class="map-wrapper"><div id="map"></div></div>
+      <div id="map"></div>
 
-        <div class="controls">
-          <div class="search">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:0.8"><path d="M21 21l-4.35-4.35" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="11" cy="11" r="6" stroke="#333" stroke-width="2" /></svg>
-            <input id="filtro" placeholder="Buscar barrio (ej: Palermo)..." />
-          </div>
-          <button id="btn-centro">Centrar</button>
-        </div>
+      <div class="buscador">
+        <input id="search" type="text" placeholder="Buscar barrio..." />
+        <button id="btnSearch">🔍</button>
+      </div>
 
-        <div class="list" id="list"></div>
+      <div class="listado" id="listado">
+        <!-- items generados por JS -->
+      </div>
+
+      <div class="botones-android">
+        <div class="boton-android atras"></div>
+        <div class="boton-android home"></div>
+        <div class="boton-android menu"></div>
       </div>
     </div>
   </div>
 
-  <!-- modal backdrop -->
-  <div class="modal-backdrop" id="backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" id="modal">
+  <!-- modal -->
+  <div class="modal-bg" id="modalBg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
       <div class="header">
-        <strong id="modal-title">Detalle</strong>
-        <button class="close" id="modal-close">&times;</button>
+        <strong id="modalTitle">Detalle</strong>
+        <button id="modalClose" aria-label="Cerrar">✕</button>
       </div>
-      <div class="body" id="modal-body"></div>
+      <div class="body" id="modalBody"></div>
     </div>
   </div>
 
   <script>
-    // Datos: 10 bauleras en barrios de CABA con coords y m2
-    const BAULERAS = [
-      { id:1, barrio:"Palermo", lat:-34.5883, lng:-58.4108, m2:10, seguro:true, disponible:"Inmediata", cal:5, imgIndex:0 },
-      { id:2, barrio:"Belgrano", lat:-34.5656, lng:-58.4385, m2:8, seguro:false, disponible:"Inmediata", cal:4, imgIndex:1 },
-      { id:3, barrio:"Caballito", lat:-34.6099, lng:-58.4336, m2:12, seguro:true, disponible:"Con reserva", cal:5, imgIndex:2 },
-      { id:4, barrio:"San Telmo", lat:-34.6153, lng:-58.3665, m2:6, seguro:false, disponible:"No", cal:3, imgIndex:0 },
-      { id:5, barrio:"Recoleta", lat:-34.5896, lng:-58.3890, m2:9, seguro:true, disponible:"Inmediata", cal:4, imgIndex:1 },
-      { id:6, barrio:"Flores", lat:-34.6320, lng:-58.4456, m2:7, seguro:true, disponible:"Inmediata", cal:5, imgIndex:2 },
-      { id:7, barrio:"Villa Crespo", lat:-34.5991, lng:-58.4302, m2:5, seguro:false, disponible:"Inmediata", cal:4, imgIndex:0 },
-      { id:8, barrio:"Almagro", lat:-34.6063, lng:-58.4120, m2:11, seguro:true, disponible:"Con reserva", cal:3, imgIndex:1 },
-      { id:9, barrio:"Chacarita", lat:-34.5999, lng:-58.4444, m2:14, seguro:true, disponible:"Inmediata", cal:5, imgIndex:2 },
-      { id:10, barrio:"Barracas", lat:-34.6281, lng:-58.3697, m2:10, seguro:false, disponible:"Inmediata", cal:4, imgIndex:0 }
+    // Datos: 10 barrios en Capital Federal con coordenadas aproximadas
+    const places = [
+      { barrio:"Palermo", lat:-34.5883, lng:-58.4108, m2:10, seguro:true, dispo:"Inmediata", cal:5, img:"img/1.jpg" },
+      { barrio:"Belgrano", lat:-34.5638, lng:-58.4416, m2:8,  seguro:false, dispo:"Inmediata", cal:4, img:"img/2.jfif" },
+      { barrio:"Caballito", lat:-34.6099, lng:-58.4336, m2:12, seguro:true, dispo:"Con reserva", cal:5, img:"img/3.jpg" },
+      { barrio:"San Telmo", lat:-34.6153, lng:-58.3665, m2:6,  seguro:false, dispo:"No", cal:3, img:"img/4.jfif" },
+      { barrio:"Recoleta", lat:-34.5896, lng:-58.3890, m2:9,  seguro:true, dispo:"Inmediata", cal:4, img:"img/5.jfif" },
+      { barrio:"Flores", lat:-34.6317, lng:-58.4522, m2:7,  seguro:true, dispo:"Inmediata", cal:5, img:"img/1.jpg" },
+      { barrio:"Villa Crespo", lat:-34.5991, lng:-58.4302, m2:5,  seguro:false, dispo:"Inmediata", cal:4, img:"img/2.jfif" },
+      { barrio:"Almagro", lat:-34.6072, lng:-58.4211, m2:11, seguro:true, dispo:"Con reserva", cal:3, img:"img/3.jpg" },
+      { barrio:"Chacarita", lat:-34.5999, lng:-58.4444, m2:14, seguro:true, dispo:"Inmediata", cal:5, img:"img/4.jfif" },
+      { barrio:"Barracas", lat:-34.6281, lng:-58.3697, m2:10, seguro:false, dispo:"Inmediata", cal:4, img:"img/5.jfif" }
     ];
 
-    // imágenes repetidas si no alcanzan (vos las reemplazás después)
-    const IMAGENES = [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1580584129278-6a7b5b2a5c8f?w=800&q=80&auto=format&fit=crop"
-    ];
-
-    // Inicializar mapa Leaflet (CABA centro)
-    const map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      maxZoom:19, attribution: '&copy; OpenStreetMap'
+    // Imágenes repetidas si no alcanzan: si no existe archivo local, se seguirá usando la ruta (vos reemplazas luego)
+    // Inicializar mapa Leaflet (OpenStreetMap)
+    const map = L.map('map').setView([-34.6037, -58.3816], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19
     }).addTo(map);
 
-    // custom icon
-    const icon = L.icon({
+    // icono por defecto (usa el provisto por leaflet)
+    const defaultIcon = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconSize: [25,41],
-      iconAnchor:[12,41],
-      popupAnchor:[0,-30]
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      shadowSize: [41, 41]
     });
 
-    // marcadores y lista
     const markers = {};
-    const listEl = document.getElementById('list');
 
-    function price(m2){ return (m2*25).toFixed(2); }
+    // render markers and listado
+    const listado = document.getElementById('listado');
 
-    function renderList(items){
-      listEl.innerHTML = '';
-      items.forEach(b=>{
-        const img = IMAGENES[b.imgIndex % IMAGENES.length];
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.dataset.id = b.id;
-        div.innerHTML = `
-          <img src="${img}" alt="${b.barrio}">
-          <div class="meta">
-            <h3>${b.barrio}</h3>
-            <p>${b.m2} m² • <span class="price">USD ${price(b.m2)}/mes</span></p>
-            <p>${b.seguro ? 'Requiere seguro' : 'Sin seguro obligatorio'} • ${b.disponible}</p>
-            <div class="badges">
-              <div class="badge">${"★".repeat(b.cal)}</div>
-              <div class="badge">${b.m2} m²</div>
-            </div>
-          </div>
-          <div class="actions">
-            <button class="btn-consultar">Consultar</button>
-            <button class="btn-preguntar">Preguntar</button>
-          </div>
-        `;
-        // click en tarjeta -> centrar en marcador + abrir popup
-        div.addEventListener('click', (e)=>{
-          if(e.target.tagName === 'BUTTON') return; // evitar conflicto con botones
-          const m = markers[b.id];
-          if(m){ map.flyTo(m.getLatLng(), 15, {duration:0.8}); m.openPopup(); }
-        });
+    function price(m2){ return (m2 * 25).toFixed(2); }
 
-        // consultar
-        div.querySelector('.btn-consultar').addEventListener('click', (ev)=>{
-          ev.stopPropagation();
-          openDetalle(b);
-        });
-
-        // preguntar
-        div.querySelector('.btn-preguntar').addEventListener('click', (ev)=>{
-          ev.stopPropagation();
-          openPregunta(b);
-        });
-
-        listEl.appendChild(div);
+    places.forEach((p, idx) => {
+      // marcador
+      const m = L.marker([p.lat, p.lng], { icon: defaultIcon }).addTo(map);
+      m.bindPopup(`<strong>${p.barrio}</strong><br>${p.m2} m² — USD ${price(p.m2)}/mes`);
+      m.on('click', () => {
+        // destacar tarjeta: scroll y sombra temporal
+        const card = document.querySelector(`.item[data-idx="${idx}"]`);
+        if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); card.style.boxShadow='0 6px 18px rgba(33,150,243,0.18)'; setTimeout(()=>card.style.boxShadow='',700); }
       });
-    }
+      markers[idx] = m;
 
-    // add markers
-    BAULERAS.forEach(b=>{
-      const m = L.marker([b.lat,b.lng], {icon}).addTo(map);
-      m.bindPopup(`<strong>${b.barrio}</strong><br>${b.m2} m² • USD ${price(b.m2)}/mes`);
-      m.on('click', ()=> {
-        // highlight in list (scroll into view)
-        const card = document.querySelector(`.card[data-id="${b.id}"]`);
-        if(card){ card.scrollIntoView({behavior:'smooth',block:'center'}); card.style.boxShadow='0 6px 18px rgba(13,110,253,0.12)'; setTimeout(()=>card.style.boxShadow='',600); }
-      });
-      markers[b.id] = m;
-    });
-
-    // initial render
-    renderList(BAULERAS);
-
-    // filtro simple por barrio
-    document.getElementById('filtro').addEventListener('input', (e)=>{
-      const q = e.target.value.trim().toLowerCase();
-      const filtered = BAULERAS.filter(b=> b.barrio.toLowerCase().includes(q));
-      renderList(filtered);
-    });
-
-    // centrar en CABA
-    document.getElementById('btn-centro').addEventListener('click', ()=> map.setView([-34.6037,-58.3816],12));
-
-    // Modal helpers
-    const backdrop = document.getElementById('backdrop');
-    const modal = document.getElementById('modal');
-    const modalBody = document.getElementById('modal-body');
-    const modalTitle = document.getElementById('modal-title');
-    const modalClose = document.getElementById('modal-close');
-
-    modalClose.addEventListener('click', closeModal);
-    backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) closeModal(); });
-
-    function openDetalle(b){
-      modalTitle.textContent = `${b.barrio} — Detalle`;
-      const img = IMAGENES[b.imgIndex % IMAGENES.length];
-      modalBody.innerHTML = `
-        <img src="${img}" alt="${b.barrio}">
-        <div class="info-row"><div><strong>Superficie</strong><div>${b.m2} m²</div></div><div><strong>Precio</strong><div>USD ${price(b.m2)}/mes</div></div></div>
-        <div class="info-row"><div><strong>Seguro</strong><div>${b.seguro ? 'Sí' : 'No'}</div></div><div><strong>Disponibilidad</strong><div>${b.disponible}</div></div></div>
-        <div class="info-row"><div><strong>Calificación</strong><div class="stars">${"★".repeat(b.cal)}${"☆".repeat(5-b.cal)}</div></div><div><strong>ID</strong><div>#${b.id}</div></div></div>
-        <p style="margin-top:8px;color:#4b5563;font-size:13px">Usuario logueado: <strong>Nahuel</strong></p>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
-          <div style="display:flex;gap:8px;align-items:center">
-            <button id="btn-reservar" style="background:#0b69d0;color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Alquilar</button>
-            <button id="btn-fav" class="heart" title="Favorito">♡</button>
-          </div>
-          <div style="font-size:12px;color:#475569">Ubicación: ${b.barrio}</div>
+      // listado (estilo original)
+      const imgSrc = p.img || `img/${(idx%5)+1}.jpg`;
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.dataset.idx = idx;
+      item.innerHTML = `
+        <img src="${imgSrc}" alt="${p.barrio}">
+        <div class="info">
+          <strong>${p.barrio}</strong>
+          ${p.m2} m² - USD ${price(p.m2)}/mes<br>
+          ${p.seguro ? 'Requiere seguro' : 'Sin seguro obligatorio'} - ${p.dispo}
+        </div>
+        <div class="acciones">
+          <button class="consultar">Consultar</button>
+          <button class="reservar">Reservar</button>
         </div>
       `;
-      backdrop.style.display='flex';
-      modal.setAttribute('aria-hidden','false');
+      // click en tarjeta (flyTo)
+      item.addEventListener('click', (e) => {
+        // si fue clic en botón, no ejecutar flyTo (botones tienen su propio handler)
+        if(e.target.tagName === 'BUTTON') return;
+        map.flyTo([p.lat, p.lng], 15, { duration: 1.0 });
+        markers[idx].openPopup();
+      });
 
-      // handlers inside modal
-      document.getElementById('btn-fav').addEventListener('click', function(){
+      // consultar
+      item.querySelector('.consultar').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        openConsulta(p, idx);
+      });
+
+      // reservar
+      item.querySelector('.reservar').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        openReservar(p, idx);
+      });
+
+      listado.appendChild(item);
+    });
+
+    // buscar barrio
+    document.getElementById('btnSearch').addEventListener('click', () => {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      if(!q) {
+        // mostrar todo y centrar
+        document.querySelectorAll('.item').forEach(i=> i.style.display='flex');
+        map.setView([-34.6037, -58.3816], 12);
+        return;
+      }
+      document.querySelectorAll('.item').forEach(item => {
+        const idx = item.dataset.idx;
+        const p = places[idx];
+        if(p.barrio.toLowerCase().includes(q)) {
+          item.style.display = 'flex';
+          // centrar en el primer match
+          map.flyTo([p.lat, p.lng], 14, { duration: 0.8 });
+          markers[idx].openPopup();
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+
+    // Modal handlers
+    const modalBg = document.getElementById('modalBg');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalClose = document.getElementById('modalClose');
+
+    modalClose.addEventListener('click', closeModal);
+    modalBg.addEventListener('click', (e) => { if(e.target === modalBg) closeModal(); });
+    document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') closeModal(); });
+
+    function closeModal(){
+      modalBg.style.display = 'none';
+      modalBg.setAttribute('aria-hidden','true');
+      modalTitle.textContent = '';
+      modalBody.innerHTML = '';
+    }
+
+    // Abrir consulta (detalle)
+    function openConsulta(p, idx){
+      modalTitle.textContent = `${p.barrio} — Detalle`;
+      const img = p.img || `img/${(idx%5)+1}.jpg`;
+      modalBody.innerHTML = `
+        <img src="${img}" alt="${p.barrio}">
+        <div class="info-row"><div><strong>Superficie</strong><div>${p.m2} m²</div></div><div><strong>Precio</strong><div>USD ${price(p.m2)}/mes</div></div></div>
+        <div class="info-row"><div><strong>Seguro</strong><div>${p.seguro ? 'Sí' : 'No'}</div></div><div><strong>Disponibilidad</strong><div>${p.dispo}</div></div></div>
+        <div class="info-row"><div><strong>Calificación</strong><div class="stars">${'★'.repeat(p.cal)}${'☆'.repeat(5-p.cal)}</div></div><div><strong>Barrio</strong><div>${p.barrio}</div></div></div>
+        <p style="margin-top:8px;color:#555;font-size:13px"><em>Usuario logueado: Nahuel</em></p>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="modalAlquilar" style="flex:1;padding:10px;border:none;border-radius:8px;background:#4caf50;color:#fff;cursor:pointer">Alquilar</button>
+          <button id="modalFav" class="heart" style="flex:0;padding:8px;border:none;background:none;font-size:18px;cursor:pointer">♡</button>
+        </div>
+      `;
+      modalBg.style.display = 'flex';
+      modalBg.setAttribute('aria-hidden','false');
+
+      document.getElementById('modalFav').addEventListener('click', function(){
         this.classList.toggle('active');
         this.textContent = this.classList.contains('active') ? '❤️' : '♡';
       });
-
-      document.getElementById('btn-reservar').addEventListener('click', ()=>{
-        openReservar(b);
-      });
-    }
-
-    function openPregunta(b){
-      modalTitle.textContent = `Consulta — ${b.barrio}`;
-      modalBody.innerHTML = `
-        <img src="${IMAGENES[b.imgIndex % IMAGENES.length]}" alt="${b.barrio}">
-        <div style="padding-top:8px">
-          <p style="margin:0 0 8px;color:#334155;font-size:13px">Enviá una consulta sobre la baulera en <strong>${b.barrio}</strong>. Te responderemos a tu email simulado.</p>
-          <form id="form-preg" class="form">
-            <label style="font-size:12px;color:#64748b">Nombre</label>
-            <input type="text" id="q-name" value="Nahuel" required>
-            <label style="font-size:12px;color:#64748b">Email</label>
-            <input type="email" id="q-email" value="nahuel@example.com" required>
-            <label style="font-size:12px;color:#64748b">Consulta</label>
-            <textarea id="q-msg" rows="4" placeholder="Escribí tu pregunta..." required></textarea>
-            <button type="submit">Enviar consulta</button>
-          </form>
-        </div>
-      `;
-      backdrop.style.display='flex';
-      modal.setAttribute('aria-hidden','false');
-
-      document.getElementById('form-preg').addEventListener('submit', (ev)=>{
-        ev.preventDefault();
-        const name = document.getElementById('q-name').value.trim();
-        const email = document.getElementById('q-email').value.trim();
-        const msg = document.getElementById('q-msg').value.trim();
-        if(!name || !email || !msg) return alert('Completá todos los campos.');
-        // simular guardado en localStorage y respuesta
-        const lista = JSON.parse(localStorage.getItem('consultas')||'[]');
-        lista.push({ barrio:b.barrio, name, email, msg, date: new Date().toISOString() });
-        localStorage.setItem('consultas', JSON.stringify(lista));
-        alert('✅ Consulta enviada. Te responderemos pronto (simulado).');
+      document.getElementById('modalAlquilar').addEventListener('click', ()=> {
         closeModal();
+        openReservar(p, idx);
       });
     }
 
-    function openReservar(b){
-      modalTitle.textContent = `Reservar — ${b.barrio}`;
+    // Abrir reservar (form)
+    function openReservar(p, idx){
+      modalTitle.textContent = `Reservar — ${p.barrio}`;
+      const img = p.img || `img/${(idx%5)+1}.jpg`;
       modalBody.innerHTML = `
-        <img src="${IMAGENES[b.imgIndex % IMAGENES.length]}" alt="${b.barrio}">
-        <div style="padding-top:8px">
-          <p style="margin:0 0 8px;color:#334155;font-size:13px">Contrato mínimo simulado: 1 mes. Depósito: 1 mes. Precio: <strong>USD ${price(b.m2)}/mes</strong>.</p>
-          <form id="form-resv" class="form">
-            <label style="font-size:12px;color:#64748b">Nombre</label>
-            <input type="text" id="r-name" value="Nahuel" required>
-            <label style="font-size:12px;color:#64748b">Email</label>
-            <input type="email" id="r-email" value="nahuel@example.com" required>
-            <label style="font-size:12px;color:#64748b">Fecha de inicio</label>
-            <input type="date" id="r-date" required>
-            <label style="font-size:12px;color:#64748b">Duración (meses)</label>
-            <select id="r-months" required>
-              <option value="1">1</option>
-              <option value="3">3</option>
-              <option value="6">6</option>
-            </select>
-            <button type="submit">Confirmar reserva (simulado)</button>
-          </form>
-        </div>
+        <img src="${img}" alt="${p.barrio}">
+        <p style="margin:8px 0 0;color:#333">Contrato mínimo: 1 mes. Depósito: 1 mes. Precio: <strong>USD ${price(p.m2)}/mes</strong>.</p>
+        <form id="resForm" class="form">
+          <label style="font-size:12px;color:#555;margin-top:8px">Nombre</label>
+          <input type="text" id="rname" value="Nahuel" required>
+          <label style="font-size:12px;color:#555;margin-top:6px">Email</label>
+          <input type="email" id="remail" value="nahuel@example.com" required>
+          <label style="font-size:12px;color:#555;margin-top:6px">Fecha inicio</label>
+          <input type="date" id="rdate" required>
+          <label style="font-size:12px;color:#555;margin-top:6px">Duración (meses)</label>
+          <select id="rmonths" required>
+            <option value="1">1</option><option value="3">3</option><option value="6">6</option>
+          </select>
+          <button type="submit">Confirmar reserva (simulado)</button>
+        </form>
       `;
-      // handler
-      document.getElementById('form-resv').addEventListener('submit', (ev)=>{
+      modalBg.style.display = 'flex';
+      modalBg.setAttribute('aria-hidden','false');
+
+      document.getElementById('resForm').addEventListener('submit', (ev)=>{
         ev.preventDefault();
-        const name = document.getElementById('r-name').value.trim();
-        const email = document.getElementById('r-email').value.trim();
-        const date = document.getElementById('r-date').value;
-        const months = document.getElementById('r-months').value;
-        if(!name || !email || !date || !months) return alert('Completá todos los campos.');
+        const name = document.getElementById('rname').value.trim();
+        const email = document.getElementById('remail').value.trim();
+        const date = document.getElementById('rdate').value;
+        const months = document.getElementById('rmonths').value;
+        if(!name||!email||!date||!months) return alert('Completá todos los campos.');
         const reservas = JSON.parse(localStorage.getItem('reservas')||'[]');
-        reservas.push({ barrio:b.barrio, name, email, date, months, precio: price(b.m2), created:new Date().toISOString() });
+        reservas.push({ barrio:p.barrio, name, email, date, months, precio:price(p.m2), created: new Date().toISOString() });
         localStorage.setItem('reservas', JSON.stringify(reservas));
         alert('✅ Reserva registrada (simulado).');
         closeModal();
       });
     }
 
-    function closeModal(){
-      backdrop.style.display='none';
-      modal.setAttribute('aria-hidden','true');
-      modalBody.innerHTML='';
-    }
-
-    // utility: scroll to marker when clicking marker (already has behavior)
-    // ensure list rendered and show markers on map bounds
-    function fitAllMarkers(){
+    // ajustar bounds para mostrar todos los marcadores
+    function fitAll(){
       const group = L.featureGroup(Object.values(markers));
-      map.fitBounds(group.getBounds().pad(0.2));
+      if(Object.keys(markers).length>0) map.fitBounds(group.getBounds().pad(0.2));
     }
+    // esperar un momento y ajustar para que el mapa muestre todo
+    setTimeout(()=> fitAll(), 250);
 
-    // center all markers on load
-    setTimeout(()=>{ fitAllMarkers(); }, 300);
+    // accesibilidad: cerrar modal con ESC
+    document.addEventListener('keydown', (e)=> { if(e.key==='Escape') closeModal(); });
 
-    // initial simple UX: click on list item scrolls to marker done in renderList
-    // but also add keyboard accessibility for modal close via ESC
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
-
-    // store user in localStorage for simulation
-    localStorage.setItem('usuario', JSON.stringify({nombre:'Nahuel', email:'nahuel@example.com'}));
-
+    // guardar usuario simulado
+    localStorage.setItem('usuario', JSON.stringify({ nombre:'Nahuel', email:'nahuel@example.com' }));
   </script>
 </body>
 </html>
+
 
 
 
