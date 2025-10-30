@@ -1,664 +1,151 @@
-        <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Samsung A15</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <style>
-    body {
-      background: #ccc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
+<style>
+  /* === NUEVO: pantalla detalle === */
+  .pantalla-detalle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: none;
+    flex-direction: column;
+    border-radius: 25px;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-in-out;
+    z-index: 2000;
+  }
 
-    .telefono {
-      width: 360px;
-      height: 780px;
-      background: #111;
-      border-radius: 35px;
-      padding: 10px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-      border: 8px solid #000;
-    }
+  .pantalla-detalle.activa {
+    display: flex;
+  }
 
-    @media (max-height: 820px) {
-      .telefono {
-        height: 95vh;
-        width: calc(95vh / 2.166);
-      }
-    }
+  .pantalla-detalle img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+  }
 
-    .pantalla {
-      background: #fff;
-      border-radius: 25px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-    }
+  .detalle-info {
+    padding: 15px;
+    font-size: 14px;
+    color: #333;
+  }
 
-    .notch {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px;
-      height: 15px;
-      background: #000;
-      border-radius: 10px;
-      z-index: 1001;
-    }
+  .detalle-info h2 {
+    margin-top: 0;
+  }
 
-    /* Vista Principal */
-    .vista-principal {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-    }
+  .acciones-detalle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+  }
 
-    #map {
-      flex: 2;
-      width: 100%;
-      height: 60%;
-      position: relative;
-      z-index: 1;
-    }
+  .btn-reservar {
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+  }
 
-    .buscador {
-      position: absolute;
-      top: 12px;
-      left: 60%;
-      transform: translateX(-50%);
-      z-index: 1002;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 6px 10px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    }
+  .corazon {
+    font-size: 26px;
+    color: #aaa;
+    cursor: pointer;
+  }
 
-    .buscador input {
-      border: none;
-      outline: none;
-      padding: 5px;
-      border-radius: 5px;
-      width: 130px;
-    }
+  .corazon.activo {
+    color: red;
+  }
 
-    .buscador button {
-      background: #2196f3;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 5px 8px;
-      cursor: pointer;
-    }
+  .cerrar-detalle {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    cursor: pointer;
+  }
 
-    .listado {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      background: #f8f8f8;
-      padding-bottom: 55px;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
 
-    .item {
-      display: flex;
-      align-items: center;
-      background: white;
-      border-radius: 10px;
-      padding: 8px;
-      margin-bottom: 8px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
+<script>
+  const map = L.map('map').setView([-34.6037, -58.3816], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
 
-    .item:active {
-      transform: scale(0.98);
-    }
+  // Coordenadas asociadas a cada barrio
+  const ubicaciones = {
+    "Villa Crespo": [-34.601, -58.435],
+    "Palermo": [-34.58, -58.42],
+    "Recoleta": [-34.59, -58.395],
+    "Caballito": [-34.62, -58.44]
+  };
 
-    .item img {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      margin-right: 10px;
-      object-fit: cover;
-    }
-
-    .info {
-      font-size: 12px;
-      flex: 1;
-    }
-
-    .info strong {
-      display: block;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .acciones {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .acciones button {
-      font-size: 10px;
-      padding: 4px 6px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: white;
-    }
-
-    .acciones .preguntar {
-      background-color: #4caf50;
-    }
-
-    .acciones .reservar {
-      background-color: #2196f3;
-    }
-
-    /* Vista Detalle */
-    .vista-detalle {
-      display: none;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-      background: white;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2000;
-      animation: slideIn 0.3s ease-out;
-    }
-
-    .vista-detalle.activa {
-      display: flex;
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-      }
-      to {
-        transform: translateX(0);
-      }
-    }
-
-    .header-detalle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 25px 15px 10px 15px;
-      background: white;
-      border-bottom: 1px solid #eee;
-    }
-
-    .btn-favorito.favorito {
-      color: #e74c3c;
-    }
-
-    .contenido-detalle {
-      flex: 1;
-      overflow-y: auto;
-      padding-bottom: 55px;
-    }
-
-    .galeria {
-      width: 100%;
-      height: 250px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      white-space: nowrap;
-      background: #000;
-    }
-
-    .galeria img {
-      height: 250px;
-      width: auto;
-      display: inline-block;
-    }
-
-    .info-detalle {
-      padding: 15px;
-    }
-
-    .info-detalle h2 {
-      margin: 0 0 10px 0;
-      font-size: 20px;
-      color: #333;
-    }
-
-    .precio {
-      font-size: 24px;
-      color: #2196f3;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .detalles-item {
-      margin: 8px 0;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .detalles-item strong {
-      color: #333;
-    }
-
-    .condiciones {
-      background: #f8f8f8;
-      padding: 15px;
-      border-radius: 10px;
-      margin: 15px 0;
-    }
-
-    .condiciones h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
-      color: #333;
-    }
-
-    .condiciones ul {
-      margin: 0;
-      padding-left: 20px;
-      font-size: 13px;
-      color: #666;
-    }
-
-    .condiciones li {
-      margin: 5px 0;
-    }
-
-    .btn-reservar-grande {
-      background: #2196f3;
-      color: white;
-      border: none;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      width: calc(100% - 30px);
-      margin: 15px;
-      transition: background 0.3s;
-    }
-
-    .btn-reservar-grande:active {
-      background: #1976d2;
-    }
-
-    /* Barra Android inferior */
-    .botones-android {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 45px;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 50px;
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
-      z-index: 1003;
-    }
-
-    .boton-android {
-      width: 22px;
-      height: 22px;
-      opacity: 0.8;
-    }
-
-    .boton-android.atras::before {
-      content: "<";
-      font-size: 22px;
-      color: white;
-      display: block;
-      text-align: center;
-    }
-
-    .boton-android.home {
-      border: 2px solid white;
-      border-radius: 5px;
-    }
-
-    .boton-android.menu {
-      width: 18px;
-      height: 2px;
-      background: white;
-      position: relative;
-    }
-
-    .boton-android.menu::before,
-    .boton-android.menu::after {
-      content: "";
-      width: 18px;
-      height: 2px;
-      background: white;
-      position: absolute;
-      left: 0;
-    }
-
-    .boton-android.menu::before {
-      top: -6px;
-    }
-
-    .boton-android.menu::after {
-      top: 6px;
-    }
-  </style>
-</head>
-<body>
-  <div class="telefono">
-    <div class="pantalla">
-      <div class="notch"></div>
-      
-      <!-- Vista Principal -->
-      <div class="vista-principal" id="vistaPrincipal">
-        <div id="map"></div>
-
-        <div class="buscador">
-          <input type="text" placeholder="Buscar zona...">
-          <button>🔍</button>
-        </div>
-
-        <div class="listado" id="listado">
-          <!-- Los items se generarán con JavaScript -->
-        </div>
-      </div>
-
-      <!-- Vista Detalle -->
-      <div class="vista-detalle" id="vistaDetalle">
-        <div class="header-detalle">
-          <button class="btn-volver" onclick="volverAPrincipal()">←</button>
-          <h3 style="margin: 0; flex: 1; text-align: center;" id="tituloDetalle"></h3>
-          <button class="btn-favorito" id="btnFavorito" onclick="toggleFavorito()">♡</button>
-        </div>
-        
-        <div class="contenido-detalle">
-          <div class="galeria" id="galeria">
-            <!-- Imágenes se cargarán aquí -->
-          </div>
-          
-          <div class="info-detalle">
-            <h2 id="nombreDetalle"></h2>
-            <div class="precio" id="precioDetalle"></div>
-            
-            <div class="detalles-item">
-              <strong>📍 Ubicación:</strong> <span id="ubicacionDetalle"></span>
-            </div>
-            <div class="detalles-item">
-              <strong>📏 Tamaño:</strong> <span id="tamanoDetalle"></span>
-            </div>
-            <div class="detalles-item">
-              <strong>📅 Disponibilidad:</strong> <span id="disponibilidadDetalle"></span>
-            </div>
-            
-            <div class="condiciones">
-              <h3>Condiciones</h3>
-              <ul id="condicionesLista">
-                <!-- Condiciones se cargarán aquí -->
-              </ul>
-            </div>
-            
-            <button class="btn-reservar-grande" onclick="realizarReserva()">RESERVAR AHORA</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="botones-android">
-        <div class="boton-android atras"></div>
-        <div class="boton-android home"></div>
-        <div class="boton-android menu"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Datos de las habitaciones
-    const habitaciones = [
-      {
-        id: 1,
-        nombre: "Villa Crespo",
-        ubicacion: "Cerca de Callao y Lavalle",
-        tamano: "9 m²",
-        disponibilidad: "Disponibilidad inmediata",
-        precio: "$85,000/mes",
-        coords: [-34.6037, -58.3816],
-        imagenes: ["img/1.jpg", "img/1.jpg", "img/1.jpg"],
-        condiciones: [
-          "Depósito de 1 mes",
-          "Gastos incluidos (luz, agua, internet)",
-          "No se permiten mascotas",
-          "Cocina y baño compartido",
-          "Contrato mínimo 3 meses"
-        ]
-      },
-      {
-        id: 2,
-        nombre: "Palermo",
-        ubicacion: "A metros de Scalabrini Ortiz",
-        tamano: "12 m²",
-        disponibilidad: "SOLO CON SEGURO",
-        precio: "$120,000/mes",
-        coords: [-34.608, -58.373],
-        imagenes: ["img/2.jfif", "img/2.jfif", "img/2.jfif"],
-        condiciones: [
-          "Seguro de caución obligatorio",
-          "Depósito de 2 meses",
-          "Expensas incluidas",
-          "Baño privado",
-          "Cocina compartida",
-          "Contrato 6 meses mínimo"
-        ]
-      },
-      {
-        id: 3,
-        nombre: "Recoleta",
-        ubicacion: "Zona céntrica",
-        tamano: "10 m²",
-        disponibilidad: "Disponibilidad inmediata",
-        precio: "$95,000/mes",
-        coords: [-34.6, -58.39],
-        imagenes: ["img/3.jpg", "img/3.jpg", "img/3.jpg"],
-        condiciones: [
-          "Depósito de 1 mes",
-          "Gastos no incluidos",
-          "Se permiten mascotas pequeñas",
-          "Baño compartido",
-          "Contrato flexible"
-        ]
-      },
-      {
-        id: 4,
-        nombre: "Caballito",
-        ubicacion: "Próximo a Rivadavia",
-        tamano: "14 m²",
-        disponibilidad: "MAXIMO 3 Meses",
-        precio: "$75,000/mes",
-        coords: [-34.61, -58.37],
-        imagenes: ["img/4.jfif", "img/4.jfif", "img/4.jfif"],
-        condiciones: [
-          "Contrato temporal (máx 3 meses)",
-          "Depósito de 1 mes",
-          "Todos los gastos incluidos",
-          "Baño privado",
-          "Cocina compartida",
-          "Amoblado completo"
-        ]
-      },
-      {
-        id: 5,
-        nombre: "Caballito Oferta",
-        ubicacion: "Próximo a Rivadavia",
-        tamano: "14 m²",
-        disponibilidad: "OFERTA: paga 5 meses y obtené 6",
-        precio: "$70,000/mes",
-        coords: [-34.59, -58.38],
-        imagenes: ["img/5.jfif", "img/5.jfif", "img/5.jfif"],
-        condiciones: [
-          "Promoción: 6to mes gratis",
-          "Pago adelantado de 5 meses",
-          "Sin depósito adicional",
-          "Gastos incluidos",
-          "Baño compartido",
-          "Ideal estudiantes"
-        ]
-      }
-    ];
-
-    let habitacionActual = null;
-    let favoritos = new Set();
-
-    // Inicializar mapa
-    const map = L.map('map').setView([-34.6037, -58.3816], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    // Agregar marcadores
-    const markers = {};
-    habitaciones.forEach(hab => {
-      const marker = L.marker(hab.coords).addTo(map);
-      marker.bindPopup(`<b>${hab.nombre}</b><br>${hab.ubicacion}`);
-      markers[hab.id] = marker;
-    });
-
-    // Generar listado
-    const listado = document.getElementById('listado');
-    habitaciones.forEach(hab => {
-      const item = document.createElement('div');
-      item.className = 'item';
-      item.innerHTML = `
-        <img src="${hab.imagenes[0]}" alt="Habitación">
-        <div class="info">
-          <strong>${hab.nombre}</strong>
-          ${hab.ubicacion}<br>
-          ${hab.tamano} - ${hab.disponibilidad}
-        </div>
-        <div class="acciones">
-          <button class="preguntar" onclick="event.stopPropagation(); abrirDetalle(${hab.id})">Preguntar</button>
-          <button class="reservar" onclick="event.stopPropagation(); abrirDetalle(${hab.id})">Reservar</button>
-        </div>
-      `;
-      
-      // Click en el item completo mueve el mapa
-      item.addEventListener('click', () => {
-        map.setView(hab.coords, 16, {
-          animate: true,
-          duration: 1
-        });
-        markers[hab.id].openPopup();
+  // === Desplazar mapa al tocar un item ===
+  document.querySelectorAll(".item").forEach(item => {
+    const nombre = item.querySelector("strong").innerText;
+    const coords = ubicaciones[nombre];
+    if (coords) {
+      item.addEventListener("click", () => {
+        map.flyTo(coords, 15, { duration: 1.2 });
       });
-      
-      listado.appendChild(item);
+    }
+  });
+
+  // === Crear y manejar pantalla de detalle ===
+  const detalle = document.createElement("div");
+  detalle.classList.add("pantalla-detalle");
+  document.body.appendChild(detalle);
+
+  function mostrarDetalle(nombre, imgSrc) {
+    detalle.innerHTML = `
+      <button class="cerrar-detalle">✕</button>
+      <img src="${imgSrc}" alt="${nombre}">
+      <div class="detalle-info">
+        <h2>${nombre}</h2>
+        <p>Habitación privada amoblada, incluye servicios básicos y WiFi. Ideal para estudiantes o trabajadores temporales.</p>
+        <p><strong>Condiciones:</strong> Contrato mínimo 1 mes. No se permiten mascotas. Depósito equivalente a un mes.</p>
+      </div>
+      <div class="acciones-detalle">
+        <button class="btn-reservar">Reservar</button>
+        <span class="corazon">♡</span>
+      </div>
+    `;
+    detalle.classList.add("activa");
+
+    detalle.querySelector(".cerrar-detalle").onclick = () => detalle.classList.remove("activa");
+
+    const corazon = detalle.querySelector(".corazon");
+    corazon.addEventListener("click", () => {
+      corazon.classList.toggle("activo");
+      corazon.innerText = corazon.classList.contains("activo") ? "❤️" : "♡";
     });
+  }
 
-    // Abrir vista detalle
-    function abrirDetalle(id) {
-      habitacionActual = habitaciones.find(h => h.id === id);
-      if (!habitacionActual) return;
-
-      // Actualizar contenido
-      document.getElementById('tituloDetalle').textContent = habitacionActual.nombre;
-      document.getElementById('nombreDetalle').textContent = habitacionActual.nombre;
-      document.getElementById('precioDetalle').textContent = habitacionActual.precio;
-      document.getElementById('ubicacionDetalle').textContent = habitacionActual.ubicacion;
-      document.getElementById('tamanoDetalle').textContent = habitacionActual.tamano;
-      document.getElementById('disponibilidadDetalle').textContent = habitacionActual.disponibilidad;
-
-      // Cargar galería
-      const galeria = document.getElementById('galeria');
-      galeria.innerHTML = habitacionActual.imagenes.map(img => 
-        `<img src="${img}" alt="Habitación">`
-      ).join('');
-
-      // Cargar condiciones
-      const condicionesList = document.getElementById('condicionesLista');
-      condicionesList.innerHTML = habitacionActual.condiciones.map(cond => 
-        `<li>${cond}</li>`
-      ).join('');
-
-      // Actualizar estado favorito
-      const btnFav = document.getElementById('btnFavorito');
-      if (favoritos.has(id)) {
-        btnFav.textContent = '❤';
-        btnFav.classList.add('favorito');
-      } else {
-        btnFav.textContent = '♡';
-        btnFav.classList.remove('favorito');
-      }
-
-      // Mostrar vista detalle
-      document.getElementById('vistaDetalle').classList.add('activa');
-    }
-
-    // Volver a vista principal
-    function volverAPrincipal() {
-      document.getElementById('vistaDetalle').classList.remove('activa');
-    }
-
-    // Toggle favorito
-    function toggleFavorito() {
-      if (!habitacionActual) return;
-      
-      const btnFav = document.getElementById('btnFavorito');
-      if (favoritos.has(habitacionActual.id)) {
-        favoritos.delete(habitacionActual.id);
-        btnFav.textContent = '♡';
-        btnFav.classList.remove('favorito');
-      } else {
-        favoritos.add(habitacionActual.id);
-        btnFav.textContent = '❤';
-        btnFav.classList.add('favorito');
-      }
-    }
-
-    // Realizar reserva
-    function realizarReserva() {
-      if (!habitacionActual) return;
-      alert(`¡Reserva iniciada para ${habitacionActual.nombre}!\n\nPrecio: ${habitacionActual.precio}\n\nEn una app real, aquí se abriría el proceso de pago y confirmación.`);
-    }
-  </script>
-</body>
-</html>-volver {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 5px;
-    }
-
-    .btn-favorito {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 5px;
-      transition: transform 0.2s;
-    }
-
-    .btn-favorito:active {
-      transform: scale(1.3);
-    }
-
-    .btn
+  // === Eventos para botones "preguntar" y "reservar" ===
+  document.querySelectorAll(".acciones .preguntar, .acciones .reservar").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation(); // evita que mueva el mapa
+      const item = e.target.closest(".item");
+      const nombre = item.querySelector("strong").innerText;
+      const imgSrc = item.querySelector("img").src;
+      mostrarDetalle(nombre, imgSrc);
+    });
+  });
+</script>
